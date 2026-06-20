@@ -7,7 +7,7 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
-import { User as SelectUser } from "@shared/schema";
+import { User as SelectUser, insertUserSchema } from "@shared/schema";
 
 declare global {
   namespace Express {
@@ -19,6 +19,23 @@ const scryptAsync = promisify(scrypt);
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_MINUTES = 15;
 const SESSION_MAX_AGE = 30 * 60 * 1000;
+
+// Only these fields can be set by a self-registering user. Excludes role,
+// provider, providerId, and tracking fields to prevent privilege escalation
+// via mass assignment.
+const registrationSchema = insertUserSchema.pick({
+  username: true,
+  password: true,
+  name: true,
+  email: true,
+  phone: true,
+  dob: true,
+});
+
+export function sanitizeUser(user: SelectUser): Omit<SelectUser, "password"> {
+  const { password, ...safe } = user;
+  return safe;
+}
 
 export async function hashPassword(password: string) {
   const salt = randomBytes(16);
@@ -239,29 +256,35 @@ export function setupAuth(app: Express) {
 
   app.post("/api/register", async (req, res, next) => {
     try {
-      const existingUser = await storage.getUserByUsername(req.body.username);
+      const parsed = registrationSchema.safeParse(req.body);
+      if (!parsed.success) {
+        return res.status(400).json({ message: parsed.error.message });
+      }
+
+      const existingUser = await storage.getUserByUsername(parsed.data.username);
       if (existingUser) {
         return res.status(400).send("Username already exists");
       }
 
+      const consentGiven = !!req.body.consentGiven;
       const user = await storage.createUser({
-        ...req.body,
-        password: await hashPassword(req.body.password),
-        consentGiven: !!req.body.consentGiven,
-        consentDate: req.body.consentGiven ? new Date().toISOString() : null,
+        ...parsed.data,
+        password: await hashPassword(parsed.data.password),
+        consentGiven,
+        consentDate: consentGiven ? new Date().toISOString() : null,
       });
 
       await storage.createAuditLog({
         userId: user.id,
         action: "account_created",
-        details: `Account created with consent: ${!!req.body.consentGiven}`,
+        details: `Account created with consent: ${consentGiven}`,
         ipAddress: getClientIp(req),
         timestamp: new Date().toISOString(),
       });
 
       req.login(user, (err) => {
         if (err) return next(err);
-        res.status(201).json(user);
+        res.status(201).json(sanitizeUser(user));
       });
     } catch (err) {
       next(err);
@@ -283,7 +306,7 @@ export function setupAuth(app: Express) {
           ipAddress: getClientIp(req),
           timestamp: new Date().toISOString(),
         });
-        res.status(200).json(user);
+        res.status(200).json(sanitizeUser(user));
       });
     })(req, res, next);
   });
@@ -307,7 +330,7 @@ export function setupAuth(app: Express) {
 
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
-    res.json(req.user);
+    res.json(sanitizeUser(req.user as SelectUser));
   });
 
   app.post("/api/consent", requireAuth, async (req, res) => {
@@ -319,8 +342,7 @@ export function setupAuth(app: Express) {
       ipAddress: getClientIp(req),
       timestamp: new Date().toISOString(),
     });
-    const { password: _, ...safe } = updated!;
-    res.json(safe);
+    res.json(sanitizeUser(updated!));
   });
 
   app.post("/api/consent/withdraw", requireAuth, async (req, res) => {
@@ -332,8 +354,7 @@ export function setupAuth(app: Express) {
       ipAddress: getClientIp(req),
       timestamp: new Date().toISOString(),
     });
-    const { password: _, ...safe } = updated!;
-    res.json(safe);
+    res.json(sanitizeUser(updated!));
   });
 
   const socialCallback = (req: any, res: any) => {

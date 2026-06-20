@@ -5,7 +5,7 @@ import fs from "fs";
 import multer from "multer";
 import crypto from "crypto";
 import { storage } from "./storage";
-import { setupAuth, requireAuth, requireAdmin, hashPassword } from "./auth";
+import { setupAuth, requireAuth, requireAdmin, hashPassword, sanitizeUser } from "./auth";
 import { sendSmsToPatients } from "./twilio";
 import { sendTransferEmail, sendAppointmentCancellation } from "./email";
 import { insertCalorieLogSchema } from "@shared/schema";
@@ -347,7 +347,7 @@ export async function registerRoutes(
     if (phone !== undefined) data.phone = phone;
     if (dob !== undefined) data.dob = dob;
     const updated = await storage.updateUser(req.user!.id, data);
-    res.json(updated);
+    res.json(sanitizeUser(updated!));
   });
 
   // ── Admin: All data ────────────────────────────────────────
@@ -512,8 +512,9 @@ export async function registerRoutes(
   });
 
   app.delete("/api/calorie-logs/:id", requireAuth, async (req, res) => {
-    const deleted = await storage.deleteCalorieLog(req.params.id);
-    if (!deleted) return res.status(404).json({ message: "Not found" });
+    const log = await storage.getCalorieLog(req.params.id);
+    if (!log || log.userId !== req.user!.id) return res.status(404).json({ message: "Not found" });
+    await storage.deleteCalorieLog(req.params.id);
     res.json({ success: true });
   });
 
