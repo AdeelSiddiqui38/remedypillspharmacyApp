@@ -38,26 +38,26 @@ Open: `http://localhost:5050`
 
 > Note: macOS can reserve port **5000** for AirPlay/AirTunes, so 5050 is recommended.
 
-## Deploy on Render (recommended)
+## Deploy on DigitalOcean App Platform (current production target)
+
+Chosen for Canada-region (Toronto/TOR1) availability for both compute and
+managed Postgres, required for Alberta College of Pharmacy data residency.
 
 High level:
-1. Create a **PostgreSQL** database on Render.
-2. Create a **Web Service** from this GitHub repo.
-3. Set environment variables in Render (from `.env.example`), especially:
-   - `DATABASE_URL` (Render provides this)
-   - `SESSION_SECRET`
-   - `APP_BASE_URL` (your Render URL / custom domain)
+1. Create a **Managed PostgreSQL** database cluster on DigitalOcean, region **TOR1 (Toronto)**.
+2. Create a **Spaces** bucket, also in **TOR1**, for SMS media uploads (see `SPACES_*` env vars).
+3. Create an **App Platform** Web Service from this GitHub repo, region **TOR1**.
+4. Set environment variables (from `.env.example`), especially:
+   - `DATABASE_URL` (from the Managed Postgres connection details)
+   - `SESSION_SECRET`, `ADMIN_BOOTSTRAP_PASSWORD`, `CONTACT_WEBHOOK_SECRET`
+   - `SPACES_REGION`, `SPACES_BUCKET`, `SPACES_KEY`, `SPACES_SECRET`
+   - `APP_BASE_URL` (the assigned App Platform URL, or custom domain)
    - OAuth keys if you enable Google sign-in
-4. Build & start:
-   - Build command: `npm install && npm run build`
-   - Start command (recommended): `npm run deploy`
+5. Build & start:
+   - Build command: `npm install --include=dev && npm run build` (`--include=dev` is required: npm skips devDependencies — including `tsx`/`vite`/`esbuild` which the build needs — whenever `NODE_ENV=production` is set, which it is here)
+   - Run command: `npm run deploy` (runs `scripts/deploy.sh`, which pushes the DB schema if `DATABASE_URL` is set, then starts the server)
 
-Notes for Render (recommended):
-- Set the Web Service **Start Command** to `npm run deploy` so Render will run migrations first (if `DATABASE_URL` is set) and then start the server.
-- Ensure `DATABASE_URL` and other secrets are set in Render environment settings.
-- If you prefer running migrations separately, keep `npm start` as the start command and run `npm run migrate` in a pre-deploy job or CI step.
-
-After deployment, avoid running `npm run db:push` manually against the Render DB unless you understand the impact; use the `deploy` script or CI-based migration runs for production.
+After deployment, avoid running `npm run db:push` manually against the production DB unless you understand the impact; use the `deploy` script or CI-based migration runs for production.
 
 ## Security notes
 - Never commit `.env` (secrets).
