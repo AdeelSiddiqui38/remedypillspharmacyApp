@@ -47,7 +47,7 @@ High level:
    - `DATABASE_URL` (Render provides this)
    - `SESSION_SECRET`
    - `APP_BASE_URL` (your Render URL / custom domain)
-   - OAuth keys if you enable Google/Facebook sign-in
+   - OAuth keys if you enable Google sign-in
 4. Build & start:
    - Build command: `npm install && npm run build`
    - Start command (recommended): `npm run deploy`

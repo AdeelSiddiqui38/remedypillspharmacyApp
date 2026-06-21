@@ -10,10 +10,19 @@ export async function seedAdminUser() {
       return;
     }
 
+    const adminPassword = process.env.ADMIN_BOOTSTRAP_PASSWORD;
+    if (!adminPassword) {
+      console.warn(
+        "ADMIN_BOOTSTRAP_PASSWORD is not set - skipping admin seed. " +
+          "Set ADMIN_BOOTSTRAP_PASSWORD in your environment to create the initial admin user.",
+      );
+      return;
+    }
+
     // Only create admin if it doesn't exist
     await storage.createUser({
       username: "admin",
-      password: await hashPassword("admin123"),
+      password: await hashPassword(adminPassword),
       name: "Administrator",
       email: "admin@remedypills.ca",
       phone: null,
@@ -28,7 +37,7 @@ export async function seedAdminUser() {
       lockedUntil: null,
     });
 
-    console.log("Admin user created: admin / admin123");
+    console.log("Admin user created with username 'admin' and the password from ADMIN_BOOTSTRAP_PASSWORD");
   } catch (err) {
     console.error("Admin seed error:", err);
   }

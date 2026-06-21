@@ -1,7 +1,6 @@
 import passport from "passport";
 import { Strategy as LocalStrategy } from "passport-local";
 import { Strategy as GoogleStrategy } from "passport-google-oauth20";
-import { Strategy as FacebookStrategy } from "passport-facebook";
 import { Express } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
@@ -216,33 +215,6 @@ export function setupAuth(app: Express) {
     );
   }
 
-  if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
-    passport.use(
-      new FacebookStrategy(
-        {
-          clientID: process.env.FACEBOOK_APP_ID,
-          clientSecret: process.env.FACEBOOK_APP_SECRET,
-          callbackURL: `${getBaseUrl()}/api/auth/facebook/callback`,
-          profileFields: ["id", "displayName", "emails"],
-        },
-        async (_accessToken: string, _refreshToken: string, profile: any, done: any) => {
-          try {
-            const user = await findOrCreateSocialUser("facebook", profile.id, {
-              name: profile.displayName,
-              email: profile.emails?.[0]?.value,
-            });
-            await storage.updateUserLoginTracking(user.id, {
-              lastLoginAt: new Date().toISOString(),
-            });
-            done(null, user);
-          } catch (err) {
-            done(err as Error);
-          }
-        },
-      ),
-    );
-  }
-
   passport.serializeUser((user, done) => done(null, user.id));
   passport.deserializeUser(async (id: string, done) => {
     try {
@@ -393,38 +365,9 @@ export function setupAuth(app: Express) {
     app.get("/api/auth/google/callback", (_req, res) => res.redirect("/auth"));
   }
 
-  // Enhanced Facebook OAuth error handling with detailed error messages  
-  if (process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET) {
-    app.get("/api/auth/facebook", passport.authenticate("facebook", { scope: ["email"] }));
-    app.get("/api/auth/facebook/callback", (req, res, next) => {
-      passport.authenticate("facebook", (err: any, user: any, info: any) => {
-        if (err) {
-          console.error("Facebook callback error:", err);
-          return res.redirect("/auth?error=facebook_error&message=" + encodeURIComponent(err.message));
-        }
-        if (!user) {
-          console.warn("Facebook callback failed:", info);
-          const errorMessage = info?.message || "Facebook authentication failed";
-          return res.redirect("/auth?error=facebook_failed&message=" + encodeURIComponent(errorMessage));
-        }
-        req.login(user, (loginErr: any) => {
-          if (loginErr) {
-            console.error("Login after Facebook failed:", loginErr);
-            return res.redirect("/auth?error=facebook_login&message=" + encodeURIComponent(loginErr.message));
-          }
-          socialCallback(req, res);
-        });
-      })(req, res, next);
-    });
-  } else {
-    app.get("/api/auth/facebook", (_req, res) => res.redirect("/auth"));
-    app.get("/api/auth/facebook/callback", (_req, res) => res.redirect("/auth"));
-  }
-
   app.get("/api/auth/providers", (_req, res) => {
     res.json({
       google: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
-      facebook: !!(process.env.FACEBOOK_APP_ID && process.env.FACEBOOK_APP_SECRET),
     });
   });
 }

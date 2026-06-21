@@ -303,7 +303,8 @@ export async function sendAppointmentCancellation(data: {
     sequence: 1,
   });
 
-  const cancelHtml = `
+  // Pharmacist copy: full detail, this is an internal pharmacy record.
+  const pharmacistHtml = `
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <div style="background: #dc2626; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
         <h2 style="margin: 0;">❌ Appointment Cancelled</h2>
@@ -316,28 +317,59 @@ export async function sendAppointmentCancellation(data: {
           <p style="margin: 4px 0 0; font-size: 14px;"><strong>Patient:</strong> ${data.patientName}</p>
           <p style="margin: 4px 0 0; font-size: 14px;"><strong>Date:</strong> ${data.date} at ${data.time}</p>
         </div>
-        <p style="font-size: 13px; color: #6b7280;">This event has been removed from the calendar. To rebook, please visit the patient portal or call us.</p>
+        <p style="font-size: 13px; color: #6b7280;">This event has been removed from the calendar.</p>
       </div>
     </div>
   `;
 
-  const recipients = [PHARMACY_EMAIL];
-  if (data.patientEmail) recipients.push(data.patientEmail);
-
   try {
     await transporter.sendMail({
       from: `"${PHARMACY_NAME}" <${PHARMACY_EMAIL}>`,
-      to: recipients.join(", "),
+      to: PHARMACY_EMAIL,
       subject: `Cancelled: ${serviceLabel} — ${data.patientName} (${data.date})`,
-      html: cancelHtml,
+      html: pharmacistHtml,
       icalEvent: {
         method: "CANCEL",
         content: cancelIcs,
       },
     });
-    console.log("Cancellation calendar update sent.");
+    console.log("Cancellation calendar update sent to pharmacist.");
   } catch (err) {
-    console.error("Failed to send cancellation:", err);
+    console.error("Failed to send cancellation to pharmacist:", err);
+  }
+
+  // Patient copy: kept content-free of health/service details — service type
+  // can reveal a health condition (e.g. "diabetes_check"), so it stays inside
+  // the authenticated app rather than in an email/SMS that may not be secure.
+  if (data.patientEmail) {
+    const patientHtml = `
+      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+        <div style="background: #dc2626; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
+          <h2 style="margin: 0;">Appointment Update</h2>
+          <p style="margin: 4px 0 0; opacity: 0.9; font-size: 14px;">${PHARMACY_NAME}</p>
+        </div>
+        <div style="border: 1px solid #e5e7eb; border-top: none; padding: 20px; border-radius: 0 0 12px 12px;">
+          <p style="font-size: 14px;">An appointment on your account has been cancelled. Please log in to the patient portal for details, or contact us to rebook.</p>
+          <p style="font-size: 13px; color: #6b7280;">${PHARMACY_NAME} · <a href="mailto:${PHARMACY_EMAIL}" style="color: #1a6b6d;">${PHARMACY_EMAIL}</a></p>
+        </div>
+      </div>
+    `;
+
+    try {
+      await transporter.sendMail({
+        from: `"${PHARMACY_NAME}" <${PHARMACY_EMAIL}>`,
+        to: data.patientEmail,
+        subject: "Appointment Update — RemedyPills Pharmacy",
+        html: patientHtml,
+        icalEvent: {
+          method: "CANCEL",
+          content: cancelIcs,
+        },
+      });
+      console.log("Cancellation notice sent to patient.");
+    } catch (err) {
+      console.error("Failed to send cancellation to patient:", err);
+    }
   }
 }
 
