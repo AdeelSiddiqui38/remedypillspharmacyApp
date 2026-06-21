@@ -25,6 +25,25 @@ export const insertUserSchema = createInsertSchema(users).omit({ id: true });
 export type InsertUser = z.infer<typeof insertUserSchema>;
 export type User = typeof users.$inferSelect;
 
+// A family member managed by a primary account holder (e.g. a parent
+// managing a child's prescriptions, or an adult-child caregiver managing a
+// parent's). The caregiver attests to having legal authority (parent/
+// guardian or Personal Directive/POA) when adding one — consentAttestedAt
+// records when that attestation was made, for HIA accountability.
+export const familyMembers = pgTable("family_members", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  accountUserId: varchar("account_user_id").notNull(),
+  name: text("name").notNull(),
+  relationship: text("relationship").notNull(),
+  dob: text("dob"),
+  consentAttestedAt: text("consent_attested_at").notNull(),
+  createdAt: text("created_at").notNull(),
+});
+
+export const insertFamilyMemberSchema = createInsertSchema(familyMembers).omit({ id: true });
+export type InsertFamilyMember = z.infer<typeof insertFamilyMemberSchema>;
+export type FamilyMember = typeof familyMembers.$inferSelect;
+
 export const prescriptions = pgTable("prescriptions", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   userId: varchar("user_id").notNull(),
@@ -39,6 +58,7 @@ export const prescriptions = pgTable("prescriptions", {
   autoRefill: boolean("auto_refill").notNull().default(false),
   pickupTime: text("pickup_time"),
   familyMemberName: text("family_member_name"),
+  familyMemberId: varchar("family_member_id"),
 });
 
 export const insertPrescriptionSchema = createInsertSchema(prescriptions).omit({ id: true });

@@ -42,6 +42,7 @@ import {
   insertNotificationSchema,
   insertHealthLogSchema,
   insertPromoBannerSchema,
+  insertFamilyMemberSchema,
 } from "@shared/schema";
 
 export async function registerRoutes(
@@ -49,6 +50,40 @@ export async function registerRoutes(
   app: Express
 ): Promise<Server> {
   setupAuth(app);
+
+  // ── Patient: Family Members ─────────────────────────────────
+  // A family member is a profile managed by the logged-in account holder
+  // (e.g. a parent managing a child's prescriptions). They don't get their
+  // own login — records are still owned by the caregiver's account, just
+  // tagged with which family member they're for.
+  app.get("/api/family-members", requireAuth, async (req, res) => {
+    const data = await storage.getFamilyMembersByAccount(req.user!.id);
+    res.json(data);
+  });
+
+  app.post("/api/family-members", requireAuth, async (req, res) => {
+    if (!req.body?.consentAttested) {
+      return res.status(400).json({ message: "You must confirm you have the authority to manage this person's health information" });
+    }
+    const parsed = insertFamilyMemberSchema.safeParse({
+      name: req.body.name,
+      relationship: req.body.relationship,
+      dob: req.body.dob || null,
+      accountUserId: req.user!.id,
+      consentAttestedAt: new Date().toISOString(),
+      createdAt: new Date().toISOString(),
+    });
+    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+    const created = await storage.createFamilyMember(parsed.data);
+    res.status(201).json(created);
+  });
+
+  app.delete("/api/family-members/:id", requireAuth, async (req, res) => {
+    const m = await storage.getFamilyMember(req.params.id);
+    if (!m || m.accountUserId !== req.user!.id) return res.status(404).json({ message: "Not found" });
+    await storage.deleteFamilyMember(req.params.id);
+    res.sendStatus(204);
+  });
 
   // ── Patient: Prescriptions ─────────────────────────────────
   app.get("/api/prescriptions", requireAuth, async (req, res) => {
@@ -63,6 +98,12 @@ export async function registerRoutes(
   });
 
   app.post("/api/prescriptions", requireAuth, async (req, res) => {
+    if (req.body.familyMemberId) {
+      const member = await storage.getFamilyMember(req.body.familyMemberId);
+      if (!member || member.accountUserId !== req.user!.id) {
+        return res.status(400).json({ message: "Invalid family member" });
+      }
+    }
     const parsed = insertPrescriptionSchema.safeParse({ ...req.body, userId: req.user!.id });
     if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
     const created = await storage.createPrescription(parsed.data);
@@ -81,11 +122,18 @@ export async function registerRoutes(
   app.patch("/api/prescriptions/:id", requireAuth, async (req, res) => {
     const p = await storage.getPrescription(req.params.id);
     if (!p || p.userId !== req.user!.id) return res.status(404).json({ message: "Not found" });
-    const { autoRefill, pickupTime, familyMemberName, status, name, strength, directions, rxNumber, lastFillDate, refillCount, refillable } = req.body;
+    if (req.body.familyMemberId) {
+      const member = await storage.getFamilyMember(req.body.familyMemberId);
+      if (!member || member.accountUserId !== req.user!.id) {
+        return res.status(400).json({ message: "Invalid family member" });
+      }
+    }
+    const { autoRefill, pickupTime, familyMemberName, familyMemberId, status, name, strength, directions, rxNumber, lastFillDate, refillCount, refillable } = req.body;
     const data: Record<string, any> = {};
     if (autoRefill !== undefined) data.autoRefill = autoRefill;
     if (pickupTime !== undefined) data.pickupTime = pickupTime;
     if (familyMemberName !== undefined) data.familyMemberName = familyMemberName;
+    if (familyMemberId !== undefined) data.familyMemberId = familyMemberId;
     if (status !== undefined) data.status = status;
     if (name !== undefined) data.name = name;
     if (strength !== undefined) data.strength = strength;

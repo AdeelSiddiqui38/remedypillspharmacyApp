@@ -123,6 +123,32 @@ export const storage = {
     const rows = await db.insert(schema.auditLogs).values(data).returning();
     return rows[0];
   },
+  // -------- Family Members --------
+  async getFamilyMembersByAccount(accountUserId: string) {
+    const rows = await db.select().from(schema.familyMembers).where(eq(schema.familyMembers.accountUserId, accountUserId));
+    return rows as any;
+  },
+
+  async getFamilyMember(id: string) {
+    const rows = await db.select().from(schema.familyMembers).where(eq(schema.familyMembers.id, id)).limit(1);
+    return (rows[0] ?? null) as any;
+  },
+
+  async createFamilyMember(data: any) {
+    const rows = await db.insert(schema.familyMembers).values(data).returning();
+    return rows[0] as any;
+  },
+
+  async updateFamilyMember(id: string, patch: Partial<any>) {
+    const rows = await db.update(schema.familyMembers).set(patch).where(eq(schema.familyMembers.id, id)).returning();
+    return rows[0] as any;
+  },
+
+  async deleteFamilyMember(id: string) {
+    await db.delete(schema.familyMembers).where(eq(schema.familyMembers.id, id));
+    return true;
+  },
+
   // -------- Prescriptions --------
   async getPrescriptionsByUser(userId: string): Promise<Prescription[]> {
     const rows = await db.select().from(schema.prescriptions).where(eq(schema.prescriptions.userId, userId));

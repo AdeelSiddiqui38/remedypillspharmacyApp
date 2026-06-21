@@ -69,6 +69,17 @@ interface Prescription {
   autoRefill: boolean;
   pickupTime?: string | null;
   familyMemberName?: string | null;
+  familyMemberId?: string | null;
+}
+
+interface FamilyMember {
+  id: string;
+  accountUserId: string;
+  name: string;
+  relationship: string;
+  dob?: string | null;
+  consentAttestedAt: string;
+  createdAt: string;
 }
 
 interface Reminder {
@@ -487,11 +498,17 @@ function TransferForm({ onSubmit, isPending }: { onSubmit: (data: TransferFormDa
 
 function PrescriptionForm({ initial, onSubmit, isPending }: { initial?: Prescription; onSubmit: (data: Record<string, any>) => void; isPending: boolean }) {
   const [rxNumber, setRxNumber] = useState(initial?.rxNumber || "");
+  const [forId, setForId] = useState(initial?.familyMemberId || "self");
+  const { data: familyMembers = [] } = useQuery<FamilyMember[]>({ queryKey: ["/api/family-members"], staleTime: 30_000 });
 
   const handleSubmit = (e: FormEvent) => {
     e.preventDefault();
-    // only send rxNumber; other values are handled by parent defaults or patch logic
-    onSubmit({ rxNumber });
+    const member = familyMembers.find((m) => m.id === forId);
+    onSubmit({
+      rxNumber,
+      familyMemberId: member ? member.id : null,
+      familyMemberName: member ? member.name : null,
+    });
   };
 
   return (
@@ -499,6 +516,20 @@ function PrescriptionForm({ initial, onSubmit, isPending }: { initial?: Prescrip
       <div className="space-y-1">
         <label className="text-xs font-semibold text-muted-foreground">Rx Number *</label>
         <Input value={rxNumber} onChange={(e) => setRxNumber(e.target.value)} placeholder="e.g. RX-12345" className="rounded-2xl" required data-testid="input-med-rx" />
+      </div>
+      <div className="space-y-1">
+        <label className="text-xs font-semibold text-muted-foreground">For</label>
+        <Select value={forId} onValueChange={setForId}>
+          <SelectTrigger className="rounded-2xl" data-testid="select-med-for">
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="self">Myself</SelectItem>
+            {familyMembers.map((m) => (
+              <SelectItem key={m.id} value={m.id}>{m.name} ({m.relationship})</SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
       <Button type="submit" className="w-full rounded-2xl bg-[hsl(186,86%,30%)] hover:bg-[hsl(186,86%,25%)]" disabled={isPending} data-testid="button-save-medication">
         {isPending ? "Saving..." : initial ? "Update Medication" : "Add Medication"}
@@ -2445,6 +2476,116 @@ function ShareAppCard() {
   );
 }
 
+function FamilyMembersCard() {
+  const qc = useQueryClient();
+  const { toast } = useToast();
+  const [showAdd, setShowAdd] = useState(false);
+  const [name, setName] = useState("");
+  const [relationship, setRelationship] = useState("");
+  const [dob, setDob] = useState("");
+  const [consentAttested, setConsentAttested] = useState(false);
+
+  const { data: familyMembers = [] } = useQuery<FamilyMember[]>({ queryKey: ["/api/family-members"], staleTime: 30_000 });
+
+  const addMutation = useMutation({
+    mutationFn: async () => {
+      await apiRequest("POST", "/api/family-members", { name, relationship, dob: dob || null, consentAttested });
+    },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["/api/family-members"] });
+      toast({ title: "Family member added" });
+      setShowAdd(false);
+      setName(""); setRelationship(""); setDob(""); setConsentAttested(false);
+    },
+    onError: (err: any) => toast({ title: "Couldn't add family member", description: err.message, variant: "destructive" }),
+  });
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => { await apiRequest("DELETE", `/api/family-members/${id}`); },
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: ["/api/family-members"] });
+      qc.invalidateQueries({ queryKey: ["/api/prescriptions"] });
+      toast({ title: "Family member removed" });
+    },
+  });
+
+  return (
+    <Card className="rounded-2xl border-0 bg-white shadow-sm">
+      <CardHeader>
+        <CardTitle className="flex items-center gap-2 text-base"><Users className="h-4 w-4 text-primary" /> Family Members</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-3">
+        <p className="text-xs text-muted-foreground">Manage prescriptions for family members you're authorized to care for, like a child or a parent.</p>
+
+        {familyMembers.length > 0 && (
+          <div className="space-y-2">
+            {familyMembers.map((m) => (
+              <div key={m.id} className="flex items-center justify-between rounded-2xl border border-gray-100 bg-gray-50 p-3" data-testid={`row-family-member-${m.id}`}>
+                <div>
+                  <p className="text-sm font-semibold">{m.name}</p>
+                  <p className="text-xs text-muted-foreground capitalize">{m.relationship}{m.dob ? ` · ${m.dob}` : ""}</p>
+                </div>
+                <Button
+                  variant="ghost"
+                  size="icon"
+                  className="h-8 w-8 text-destructive"
+                  onClick={() => deleteMutation.mutate(m.id)}
+                  data-testid={`button-remove-family-member-${m.id}`}
+                >
+                  <Trash2 className="h-4 w-4" />
+                </Button>
+              </div>
+            ))}
+          </div>
+        )}
+
+        <Button variant="outline" size="sm" className="rounded-2xl text-xs" onClick={() => setShowAdd(true)} data-testid="button-add-family-member">
+          <Plus className="h-3 w-3 mr-1" /> Add Family Member
+        </Button>
+      </CardContent>
+
+      <Dialog open={showAdd} onOpenChange={setShowAdd}>
+        <DialogContent className="max-w-sm rounded-3xl">
+          <DialogHeader><DialogTitle>Add Family Member</DialogTitle></DialogHeader>
+          <form
+            className="space-y-3"
+            onSubmit={(e) => { e.preventDefault(); addMutation.mutate(); }}
+          >
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-muted-foreground">Name *</label>
+              <Input value={name} onChange={(e) => setName(e.target.value)} className="rounded-2xl" required data-testid="input-family-member-name" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-muted-foreground">Relationship *</label>
+              <Input value={relationship} onChange={(e) => setRelationship(e.target.value)} placeholder="e.g. Child, Parent, Spouse" className="rounded-2xl" required data-testid="input-family-member-relationship" />
+            </div>
+            <div className="space-y-1">
+              <label className="text-xs font-semibold text-muted-foreground">Date of Birth</label>
+              <Input type="date" value={dob} onChange={(e) => setDob(e.target.value)} className="rounded-2xl" data-testid="input-family-member-dob" />
+            </div>
+            <label className="flex items-start gap-2 cursor-pointer rounded-2xl border border-primary/20 bg-primary/5 p-3">
+              <input
+                type="checkbox"
+                checked={consentAttested}
+                onChange={(e) => setConsentAttested(e.target.checked)}
+                className="mt-0.5 h-4 w-4 accent-primary"
+                required
+                data-testid="input-family-member-consent"
+              />
+              <span className="text-xs text-muted-foreground leading-relaxed">
+                I confirm I have the legal authority to manage this person's health information (as their parent/guardian, or under a Personal Directive or Power of Attorney).
+              </span>
+            </label>
+            <Button type="submit" className="w-full rounded-2xl" disabled={addMutation.isPending || !consentAttested} data-testid="button-save-family-member">
+              {addMutation.isPending ? "Saving..." : "Add Family Member"}
+            </Button>
+          </form>
+        </DialogContent>
+      </Dialog>
+    </Card>
+  );
+}
+
 function AccountTab({
   user,
   onUpdateProfile,
@@ -2533,6 +2674,8 @@ function AccountTab({
           </form>
         </CardContent>
       </Card>
+
+      <FamilyMembersCard />
 
       <Card className="rounded-2xl border-0 bg-white shadow-sm">
         <CardHeader>
