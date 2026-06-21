@@ -22,19 +22,28 @@ import type {
 
 const { Pool } = pg;
 
-const connectionString = process.env.DATABASE_URL;
-if (!connectionString) {
+const rawConnectionString = process.env.DATABASE_URL;
+if (!rawConnectionString) {
   throw new Error(
-    "DATABASE_URL is missing. Set it in Render Environment Variables (or .env locally).",
+    "DATABASE_URL is missing. Set it in your hosting provider's environment variables (or .env locally).",
   );
 }
 
-const isProd = process.env.NODE_ENV === "production";
+// Managed Postgres providers (Neon, DigitalOcean, Render, etc.) require SSL,
+// but newer `pg` versions treat sslmode=require/prefer/verify-ca in the
+// connection string as an alias for verify-full, which fails against hosts
+// using a private CA (e.g. DigitalOcean's managed Postgres) even when an
+// explicit `ssl: { rejectUnauthorized: false }` is also passed. Stripping
+// sslmode from the URL and controlling SSL purely via the `ssl` option
+// avoids that conflict regardless of what's in DATABASE_URL.
+const dbUrl = new URL(rawConnectionString);
+dbUrl.searchParams.delete("sslmode");
+const connectionString = dbUrl.toString();
+const isLocalDb = dbUrl.hostname === "localhost" || dbUrl.hostname === "127.0.0.1";
 
-// Render Postgres usually needs SSL; local Postgres usually doesn't.
 export const pool = new Pool({
   connectionString,
-  ssl: isProd ? { rejectUnauthorized: false } : undefined,
+  ssl: isLocalDb ? undefined : { rejectUnauthorized: false },
 });
 
 // Drizzle DB
