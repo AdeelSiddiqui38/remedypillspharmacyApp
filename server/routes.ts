@@ -1,26 +1,16 @@
 import type { Express } from "express";
 import { type Server } from "http";
-import path from "path";
-import fs from "fs";
 import multer from "multer";
 import crypto from "crypto";
 import { storage } from "./storage";
 import { setupAuth, requireAuth, requireAdmin, hashPassword, sanitizeUser } from "./auth";
 import { sendSmsToPatients } from "./twilio";
 import { sendTransferEmail, sendAppointmentCancellation } from "./email";
+import { uploadFile } from "./object-storage";
 import { insertCalorieLogSchema } from "@shared/schema";
 
-const uploadsDir = path.join(process.cwd(), "uploads");
-if (!fs.existsSync(uploadsDir)) fs.mkdirSync(uploadsDir, { recursive: true });
-
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (_req, _file, cb) => cb(null, uploadsDir),
-    filename: (_req, file, cb) => {
-      const ext = path.extname(file.originalname);
-      cb(null, `${Date.now()}-${Math.random().toString(36).slice(2, 8)}${ext}`);
-    },
-  }),
+  storage: multer.memoryStorage(),
   limits: { fileSize: 5 * 1024 * 1024 },
   fileFilter: (_req, file, cb) => {
     const allowed = [
@@ -579,26 +569,22 @@ export async function registerRoutes(
     res.json({ success: true });
   });
 
-  app.use("/uploads", (req, res, next) => {
-    const filePath = path.join(uploadsDir, path.basename(req.path));
-    if (fs.existsSync(filePath)) {
-      res.sendFile(filePath);
-    } else {
-      res.status(404).json({ message: "File not found" });
-    }
-  });
-
-  app.post("/api/admin/sms/upload", requireAdmin, upload.single("file"), (req, res) => {
+  app.post("/api/admin/sms/upload", requireAdmin, upload.single("file"), async (req, res) => {
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" });
     }
-    const fileUrl = `/uploads/${req.file.filename}`;
-    res.json({
-      url: fileUrl,
-      filename: req.file.originalname,
-      size: req.file.size,
-      mimetype: req.file.mimetype,
-    });
+    try {
+      const { url } = await uploadFile(req.file.buffer, req.file.originalname, req.file.mimetype);
+      res.json({
+        url,
+        filename: req.file.originalname,
+        size: req.file.size,
+        mimetype: req.file.mimetype,
+      });
+    } catch (err: any) {
+      console.error("Spaces upload error:", err);
+      res.status(500).json({ message: "Failed to upload file" });
+    }
   });
 
   app.post("/api/admin/sms/broadcast", requireAdmin, async (req, res) => {
@@ -622,12 +608,10 @@ export async function registerRoutes(
       return res.status(404).json({ message: "No patients with phone numbers found" });
     }
 
-    let absoluteMediaUrl: string | undefined;
-    if (mediaUrl) {
-      const host = req.headers.host || "localhost:5000";
-      const protocol = req.headers["x-forwarded-proto"] || req.protocol || "https";
-      absoluteMediaUrl = `${protocol}://${host}${mediaUrl}`;
-    }
+    // mediaUrl now comes from the Spaces upload endpoint as an already-absolute
+    // URL (e.g. https://bucket.tor1.digitaloceanspaces.com/...), which Twilio
+    // requires for MMS media anyway.
+    const absoluteMediaUrl: string | undefined = mediaUrl || undefined;
 
     try {
       const result = await sendSmsToPatients(patientsWithPhone, message.trim(), absoluteMediaUrl);
