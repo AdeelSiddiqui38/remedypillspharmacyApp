@@ -388,9 +388,25 @@ export async function registerRoutes(
   });
 
   app.patch("/api/admin/users/:id", requireAdmin, async (req, res) => {
-    const { name, email, phone, dob } = req.body;
-    const updated = await storage.updateUser(req.params.id, { name, email, phone, dob });
+    const { name, email, phone, dob, password } = req.body;
+    const data: Record<string, any> = { name, email, phone, dob };
+    if (password) {
+      if (typeof password !== "string" || password.length < 8) {
+        return res.status(400).json({ message: "Password must be at least 8 characters" });
+      }
+      data.password = await hashPassword(password);
+    }
+    const updated = await storage.updateUser(req.params.id, data);
     if (!updated) return res.status(404).json({ message: "User not found" });
+    if (password) {
+      await storage.createAuditLog({
+        userId: req.params.id,
+        action: "password_reset_by_admin",
+        details: `Password reset by admin (${req.user!.id})`,
+        ipAddress: req.ip || "unknown",
+        timestamp: new Date().toISOString(),
+      });
+    }
     const { password: _, ...safe } = updated;
     res.json(safe);
   });

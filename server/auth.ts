@@ -42,7 +42,7 @@ export async function hashPassword(password: string) {
   return `${buf.toString("hex")}.${salt.toString("hex")}`;
 }
 
-async function comparePasswords(supplied: string, stored: string) {
+export async function comparePasswords(supplied: string, stored: string) {
   const [hashed, saltHex] = stored.split(".");
   const hashedBuf = Buffer.from(hashed, "hex");
   const salt = Buffer.from(saltHex, "hex");
@@ -303,6 +303,31 @@ export function setupAuth(app: Express) {
   app.get("/api/user", (req, res) => {
     if (!req.isAuthenticated()) return res.sendStatus(401);
     res.json(sanitizeUser(req.user as SelectUser));
+  });
+
+  app.post("/api/account/change-password", requireAuth, async (req, res) => {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({ message: "currentPassword and newPassword are required" });
+    }
+    if (typeof newPassword !== "string" || newPassword.length < 8) {
+      return res.status(400).json({ message: "New password must be at least 8 characters" });
+    }
+
+    const user = await storage.getUser(req.user!.id);
+    if (!user || !(await comparePasswords(currentPassword, user.password))) {
+      return res.status(401).json({ message: "Current password is incorrect" });
+    }
+
+    await storage.updateUser(user.id, { password: await hashPassword(newPassword) });
+    await storage.createAuditLog({
+      userId: user.id,
+      action: "password_changed",
+      details: "User changed their own password",
+      ipAddress: getClientIp(req),
+      timestamp: new Date().toISOString(),
+    });
+    res.json({ success: true });
   });
 
   app.post("/api/consent", requireAuth, async (req, res) => {

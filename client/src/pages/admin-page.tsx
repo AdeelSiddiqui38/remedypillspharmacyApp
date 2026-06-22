@@ -16,6 +16,7 @@ import {
   Edit,
   FileText,
   Gift,
+  Key,
   LogOut,
   Mail,
   MessageCircle,
@@ -29,7 +30,18 @@ import {
 } from "lucide-react";
 import remedyLogo from "@assets/Remedypills_logo_1_1771941028931.png";
 
-type AdminTab = "patients" | "messages" | "communications" | "offers";
+type AdminTab = "patients" | "messages" | "communications" | "offers" | "notifications";
+
+interface AdminNotification {
+  id: string;
+  userId: string;
+  type: string;
+  title: string;
+  body: string;
+  read: boolean;
+  createdAt: string;
+  metadata?: string | null;
+}
 
 interface AdminUser {
   id: string;
@@ -63,12 +75,32 @@ export default function AdminPage() {
   const [replyText, setReplyText] = useState("");
   const [smsResult, setSmsResult] = useState<{ sent: number; failed: number; errors: string[] } | null>(null);
   const [patientSearch, setPatientSearch] = useState("");
+  const [showChangePassword, setShowChangePassword] = useState(false);
 
   if (!user) return <Redirect to="/auth" />;
   if (user.role !== "admin") return <Redirect to="/" />;
 
   const { data: users = [] } = useQuery<AdminUser[]>({ queryKey: ["/api/admin/users"], staleTime: 30_000 });
   const { data: allMessages = [] } = useQuery<Message[]>({ queryKey: ["/api/admin/messages"], enabled: activeTab === "messages", staleTime: 15_000 });
+  const { data: notifications = [] } = useQuery<AdminNotification[]>({ queryKey: ["/api/notifications"], staleTime: 10_000 });
+  const unreadNotifications = notifications.filter((n) => !n.read).length;
+
+  const markNotificationReadMutation = useMutation({
+    mutationFn: async (id: string) => { await apiRequest("PATCH", `/api/notifications/${id}/read`); },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["/api/notifications"] }),
+  });
+
+  const markAllNotificationsReadMutation = useMutation({
+    mutationFn: async () => { await apiRequest("POST", "/api/notifications/read-all"); },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["/api/notifications"] }),
+  });
+
+  const changePasswordMutation = useMutation({
+    mutationFn: async (data: { currentPassword: string; newPassword: string }) => {
+      await apiRequest("POST", "/api/account/change-password", data);
+    },
+    onSuccess: () => setShowChangePassword(false),
+  });
 
   const patients = users.filter((u) => u.role === "patient");
   const filteredPatients = patients.filter((p) => {
@@ -132,7 +164,7 @@ export default function AdminPage() {
   });
 
   const editPatientMutation = useMutation({
-    mutationFn: async ({ id, ...data }: { id: string; name: string; email?: string | null; phone?: string | null; dob?: string | null }) => {
+    mutationFn: async ({ id, ...data }: { id: string; name: string; email?: string | null; phone?: string | null; dob?: string | null; password?: string }) => {
       await apiRequest("PATCH", `/api/admin/users/${id}`, data);
     },
     onSuccess: () => {
@@ -187,6 +219,7 @@ export default function AdminPage() {
 
   const tabs: { id: AdminTab; label: string; icon: React.ReactNode; count?: number }[] = [
     { id: "patients", label: "Patients", icon: <Users className="h-4 w-4" />, count: patients.length },
+    { id: "notifications", label: "Notifications", icon: <Bell className="h-4 w-4" />, count: unreadNotifications },
     { id: "messages", label: "Messages", icon: <MessageCircle className="h-4 w-4" />, count: unreadConversations },
     { id: "communications", label: "Communications", icon: <Send className="h-4 w-4" /> },
     { id: "offers", label: "Offers", icon: <Gift className="h-4 w-4" />, count: promoBanners.length },
@@ -209,6 +242,16 @@ export default function AdminPage() {
           </div>
           <div className="flex items-center gap-3">
             <Badge variant="secondary" className="rounded-full" data-testid="badge-admin-role">Admin</Badge>
+            <Button
+              variant="outline"
+              size="sm"
+              className="rounded-2xl"
+              onClick={() => setShowChangePassword(true)}
+              data-testid="button-change-password"
+            >
+              <Key className="mr-2 h-4 w-4" />
+              Change Password
+            </Button>
             <Button
               variant="outline"
               size="sm"
@@ -336,6 +379,78 @@ export default function AdminPage() {
                     </div>
                   </div>
                 ))
+              )}
+            </CardContent>
+          </Card>
+        )}
+
+        {activeTab === "notifications" && (
+          <Card className="rounded-3xl border-card-border bg-card/70 shadow-sm backdrop-blur-xl">
+            <CardHeader className="flex flex-row items-center justify-between">
+              <CardTitle className="text-base">Notifications</CardTitle>
+              {unreadNotifications > 0 && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="rounded-2xl text-xs"
+                  onClick={() => markAllNotificationsReadMutation.mutate()}
+                  data-testid="button-mark-all-read"
+                >
+                  Mark all as read
+                </Button>
+              )}
+            </CardHeader>
+            <CardContent className="space-y-3">
+              {notifications.length === 0 ? (
+                <div className="py-8 text-center">
+                  <Bell className="mx-auto mb-3 h-10 w-10 text-muted-foreground/30" />
+                  <p className="text-sm text-muted-foreground">No notifications yet.</p>
+                  <p className="mt-1 text-xs text-muted-foreground">Contact form submissions from remedypills.ca and system alerts will appear here.</p>
+                </div>
+              ) : (
+                notifications
+                  .slice()
+                  .sort((a, b) => b.createdAt.localeCompare(a.createdAt))
+                  .map((n) => {
+                    let metadata: Record<string, string> | null = null;
+                    try { metadata = n.metadata ? JSON.parse(n.metadata) : null; } catch { metadata = null; }
+                    return (
+                      <div
+                        key={n.id}
+                        className={`rounded-2xl border p-4 ${n.read ? "bg-background/40" : "bg-primary/5 border-primary/20"}`}
+                        data-testid={`notification-${n.id}`}
+                      >
+                        <div className="flex items-start justify-between gap-3">
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-center gap-2">
+                              <p className="text-sm font-semibold">{n.title}</p>
+                              {!n.read && <Badge className="rounded-full text-[10px]">New</Badge>}
+                            </div>
+                            <p className="mt-1 text-sm text-muted-foreground">{n.body}</p>
+                            {metadata && (
+                              <div className="mt-2 space-y-0.5 rounded-xl bg-muted/50 p-2 text-xs text-muted-foreground">
+                                {Object.entries(metadata).map(([key, value]) => (
+                                  <p key={key}><span className="font-medium text-foreground">{key}:</span> {value}</p>
+                                ))}
+                              </div>
+                            )}
+                            <p className="mt-2 text-[10px] text-muted-foreground/70">{new Date(n.createdAt).toLocaleString()}</p>
+                          </div>
+                          {!n.read && (
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              className="shrink-0 rounded-xl text-xs"
+                              onClick={() => markNotificationReadMutation.mutate(n.id)}
+                              data-testid={`button-mark-read-${n.id}`}
+                            >
+                              Mark read
+                            </Button>
+                          )}
+                        </div>
+                      </div>
+                    );
+                  })
               )}
             </CardContent>
           </Card>
@@ -640,6 +755,14 @@ export default function AdminPage() {
           )}
         </DialogContent>
       </Dialog>
+
+      <ChangePasswordDialog
+        open={showChangePassword}
+        onClose={() => setShowChangePassword(false)}
+        onSubmit={(data) => changePasswordMutation.mutate(data)}
+        isPending={changePasswordMutation.isPending}
+        error={changePasswordMutation.isError ? (changePasswordMutation.error as any)?.message : null}
+      />
     </div>
   );
 }
@@ -957,11 +1080,12 @@ function AddPatientModal({ open, onClose, onSubmit, isPending }: { open: boolean
   );
 }
 
-function EditPatientModal({ patient, onClose, onSubmit, isPending }: { patient: AdminUser | null; onClose: () => void; onSubmit: (data: { id: string; name: string; email?: string | null; phone?: string | null; dob?: string | null }) => void; isPending: boolean }) {
+function EditPatientModal({ patient, onClose, onSubmit, isPending }: { patient: AdminUser | null; onClose: () => void; onSubmit: (data: { id: string; name: string; email?: string | null; phone?: string | null; dob?: string | null; password?: string }) => void; isPending: boolean }) {
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [dob, setDob] = useState("");
+  const [newPassword, setNewPassword] = useState("");
 
   useEffect(() => {
     if (patient) {
@@ -969,13 +1093,14 @@ function EditPatientModal({ patient, onClose, onSubmit, isPending }: { patient: 
       setEmail(patient.email || "");
       setPhone(patient.phone || "");
       setDob(patient.dob || "");
+      setNewPassword("");
     }
   }, [patient]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!patient) return;
-    onSubmit({ id: patient.id, name, email: email || null, phone: phone || null, dob: dob || null });
+    onSubmit({ id: patient.id, name, email: email || null, phone: phone || null, dob: dob || null, password: newPassword || undefined });
   };
 
   return (
@@ -1001,8 +1126,85 @@ function EditPatientModal({ patient, onClose, onSubmit, isPending }: { patient: 
             <label className="text-xs font-semibold text-muted-foreground">Date of Birth</label>
             <Input type="date" value={dob} onChange={(e) => setDob(e.target.value)} className="rounded-2xl" data-testid="input-edit-dob" />
           </div>
-          <Button type="submit" className="w-full rounded-2xl" disabled={isPending} data-testid="button-submit-edit-patient">
+          <div className="space-y-1 rounded-2xl border border-dashed p-3">
+            <label className="text-xs font-semibold text-muted-foreground">Reset Password (optional)</label>
+            <Input
+              type="password"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              placeholder="Leave blank to keep current password"
+              className="rounded-2xl"
+              data-testid="input-edit-reset-password"
+            />
+            {newPassword && newPassword.length < 8 && (
+              <p className="text-xs text-destructive">Password must be at least 8 characters.</p>
+            )}
+          </div>
+          <Button type="submit" className="w-full rounded-2xl" disabled={isPending || (!!newPassword && newPassword.length < 8)} data-testid="button-submit-edit-patient">
             {isPending ? "Saving..." : "Save Changes"}
+          </Button>
+        </form>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function ChangePasswordDialog({
+  open,
+  onClose,
+  onSubmit,
+  isPending,
+  error,
+}: {
+  open: boolean;
+  onClose: () => void;
+  onSubmit: (data: { currentPassword: string; newPassword: string }) => void;
+  isPending: boolean;
+  error?: string | null;
+}) {
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
+  useEffect(() => {
+    if (!open) {
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    }
+  }, [open]);
+
+  const mismatch = confirmPassword.length > 0 && newPassword !== confirmPassword;
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (mismatch || newPassword.length < 8) return;
+    onSubmit({ currentPassword, newPassword });
+  };
+
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent className="rounded-3xl">
+        <DialogHeader>
+          <DialogTitle>Change Password</DialogTitle>
+        </DialogHeader>
+        <form onSubmit={handleSubmit} className="space-y-3">
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-muted-foreground">Current Password</label>
+            <Input type="password" value={currentPassword} onChange={(e) => setCurrentPassword(e.target.value)} className="rounded-2xl" required data-testid="input-current-password" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-muted-foreground">New Password</label>
+            <Input type="password" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} className="rounded-2xl" required minLength={8} data-testid="input-new-password" />
+          </div>
+          <div className="space-y-1">
+            <label className="text-xs font-semibold text-muted-foreground">Confirm New Password</label>
+            <Input type="password" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} className="rounded-2xl" required data-testid="input-confirm-password" />
+            {mismatch && <p className="text-xs text-destructive">Passwords don't match.</p>}
+          </div>
+          {error && <p className="text-xs text-destructive">{error}</p>}
+          <Button type="submit" className="w-full rounded-2xl" disabled={isPending || mismatch || newPassword.length < 8} data-testid="button-submit-change-password">
+            {isPending ? "Saving..." : "Change Password"}
           </Button>
         </form>
       </DialogContent>
