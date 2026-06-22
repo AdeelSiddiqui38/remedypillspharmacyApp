@@ -187,7 +187,7 @@ const PHARMACY_INFO = {
   fax: "+1 (403) 518-7522",
   email: "remedypillspharmacy@gmail.com",
   website: "https://www.remedypills.ca",
-  hoursSummary: "Mon\u2013Fri 9:00 AM\u20135:00 PM \u00b7 Sat 10:00 AM\u20132:00 PM \u00b7 Sun Closed",
+  hoursSummary: "Mon\u2013Fri 9:00 AM\u20135:00 PM \u00b7 Sat 10:00 AM\u20133:00 PM \u00b7 Sun Closed",
 };
 
 const WHATSAPP_CONFIG = {
@@ -475,12 +475,13 @@ function TransferForm({ onSubmit, isPending }: { onSubmit: (data: TransferFormDa
 
         <div className="my-2 border-t" />
         <p className="text-xs font-bold uppercase tracking-wider text-muted-foreground">Prescription Details</p>
+        <p className="text-xs text-muted-foreground">Don't know the exact medication name or Rx number? No problem — leave these blank and we'll look it up with your current pharmacy.</p>
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-muted-foreground">Medication Name *</label>
-          <Input value={medicationName} onChange={(e) => setMedicationName(e.target.value)} placeholder="e.g. Metformin 500mg" className="rounded-2xl" required data-testid="input-transfer-medication" />
+          <label className="text-xs font-semibold text-muted-foreground">Medication Name (if known)</label>
+          <Input value={medicationName} onChange={(e) => setMedicationName(e.target.value)} placeholder="e.g. Metformin 500mg" className="rounded-2xl" data-testid="input-transfer-medication" />
         </div>
         <div className="space-y-1">
-          <label className="text-xs font-semibold text-muted-foreground">Rx Number (from label)</label>
+          <label className="text-xs font-semibold text-muted-foreground">Rx Number (from label, if known)</label>
           <Input value={rxNumber} onChange={(e) => setRxNumber(e.target.value)} placeholder="e.g. RX-123456" className="rounded-2xl" data-testid="input-transfer-rx-number" />
         </div>
         <div className="space-y-1">
@@ -739,7 +740,7 @@ export default function PharmacyApp() {
     sendMessageMutation.mutate({ sender: "user", text: newMessage.trim(), timestamp: new Date().toISOString(), category: chatCategory });
     setNewMessage("");
     window.setTimeout(() => {
-      sendMessageMutation.mutate({ sender: "pharmacist", text: "Thanks \u2014 I've received your message. We'll reply as soon as possible.", timestamp: new Date().toISOString(), category: chatCategory });
+      sendMessageMutation.mutate({ sender: "pharmacist", text: "Thanks \u2014 this has been sent to our pharmacy team. We typically respond within 1 business day (up to 48 hours on weekends/holidays). For urgent matters, please call us directly.", timestamp: new Date().toISOString(), category: chatCategory });
     }, 700);
   };
 
@@ -962,6 +963,9 @@ export default function PharmacyApp() {
               </Select>
               <div className="rounded-2xl border bg-muted/30 p-3 text-xs text-muted-foreground" data-testid="box-chat-note">
                 Get trusted guidance from your local pharmacist. Messages are saved and reviewed by our pharmacy team.
+                <p className="mt-2 font-medium text-foreground">
+                  We aim to respond within 1 business day (up to 48 hours on weekends/holidays). This is not for urgent issues — for medical emergencies call 911, or for urgent medication concerns after hours call Alberta Health Link at 811.
+                </p>
               </div>
             </div>
             <div className="flex min-h-[420px] flex-col rounded-2xl border bg-background/60">

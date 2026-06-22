@@ -382,7 +382,7 @@ export async function sendTransferEmail(data: {
   pharmacyName: string;
   pharmacyPhone: string;
   pharmacyFax?: string;
-  medicationName: string;
+  medicationName?: string;
   rxNumber?: string;
   notes?: string;
 }) {
@@ -420,7 +420,7 @@ export async function sendTransferEmail(data: {
         
         <h3 style="color: #1a6b6d;">Prescription Details</h3>
         <table style="width: 100%; border-collapse: collapse; font-size: 14px;">
-          <tr><td style="padding: 6px 0; color: #6b7280; width: 140px;">Medication:</td><td style="padding: 6px 0; font-weight: 600;">${data.medicationName}</td></tr>
+          <tr><td style="padding: 6px 0; color: #6b7280; width: 140px;">Medication:</td><td style="padding: 6px 0; font-weight: 600;">${data.medicationName || "Not provided — please look up with current pharmacy"}</td></tr>
           ${data.rxNumber ? `<tr><td style="padding: 6px 0; color: #6b7280;">Rx Number:</td><td style="padding: 6px 0;">${data.rxNumber}</td></tr>` : ""}
           ${data.notes ? `<tr><td style="padding: 6px 0; color: #6b7280;">Notes:</td><td style="padding: 6px 0;">${data.notes}</td></tr>` : ""}
         </table>
@@ -435,7 +435,7 @@ export async function sendTransferEmail(data: {
   await transporter.sendMail({
     from: `"${PHARMACY_NAME}" <${PHARMACY_EMAIL}>`,
     to: PHARMACY_EMAIL,
-    subject: `Transfer Request: ${data.firstName} ${data.lastName} — ${data.medicationName}`,
+    subject: `Transfer Request: ${data.firstName} ${data.lastName}${data.medicationName ? ` — ${data.medicationName}` : ""}`,
     html,
   });
 }

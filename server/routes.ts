@@ -186,7 +186,7 @@ export async function registerRoutes(
     3: { open: 9, close: 17 },
     4: { open: 9, close: 17 },
     5: { open: 9, close: 17 },
-    6: { open: 10, close: 14 },
+    6: { open: 10, close: 15 },
   };
 
   app.get("/api/available-slots", requireAuth, async (req, res) => {
@@ -295,7 +295,7 @@ export async function registerRoutes(
 
   app.post("/api/transfer-request", requireAuth, async (req, res) => {
     const { firstName, lastName, dob, phone, email, pharmacyName, pharmacyPhone, pharmacyFax, medicationName, rxNumber, notes } = req.body;
-    if (!firstName || !lastName || !dob || !phone || !pharmacyName || !pharmacyPhone || !medicationName) {
+    if (!firstName || !lastName || !dob || !phone || !pharmacyName || !pharmacyPhone) {
       return res.status(400).json({ message: "Please fill in all required fields" });
     }
     try {
