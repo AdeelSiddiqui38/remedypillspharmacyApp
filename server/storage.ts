@@ -41,9 +41,18 @@ dbUrl.searchParams.delete("sslmode");
 const connectionString = dbUrl.toString();
 const isLocalDb = dbUrl.hostname === "localhost" || dbUrl.hostname === "127.0.0.1";
 
+// TLS: if the provider's CA certificate is supplied (DATABASE_CA_CERT, PEM
+// contents), verify the server certificate against it. Falling back to
+// rejectUnauthorized:false keeps existing deployments working but disables
+// certificate verification — set DATABASE_CA_CERT in production.
+const caCert = process.env.DATABASE_CA_CERT;
 export const pool = new Pool({
   connectionString,
-  ssl: isLocalDb ? undefined : { rejectUnauthorized: false },
+  ssl: isLocalDb
+    ? undefined
+    : caCert
+      ? { ca: caCert, rejectUnauthorized: true }
+      : { rejectUnauthorized: false },
 });
 
 // Drizzle DB

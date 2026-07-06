@@ -313,7 +313,7 @@ export default function AdminPage() {
               {t.icon}
               <span className="ml-2">{t.label}</span>
               {t.count !== undefined && t.count > 0 && (
-                <Badge variant={activeTab === t.id ? "secondary" : "outline"} className="ml-2 rounded-full text-[10px]">
+                <Badge variant={activeTab === t.id ? "secondary" : "outline"} className="ml-2 rounded-full text-xs">
                   {t.count}
                 </Badge>
               )}
@@ -361,12 +361,12 @@ export default function AdminPage() {
                     </div>
                     <div className="flex items-center gap-2">
                       {p.phone && (
-                        <Badge variant="outline" className="rounded-full text-[10px]">
+                        <Badge variant="outline" className="rounded-full text-xs">
                           <Phone className="mr-1 h-3 w-3" /> SMS
                         </Badge>
                       )}
                       {p.email && (
-                        <Badge variant="outline" className="rounded-full text-[10px]">
+                        <Badge variant="outline" className="rounded-full text-xs">
                           <Mail className="mr-1 h-3 w-3" /> Email
                         </Badge>
                       )}
@@ -424,7 +424,7 @@ export default function AdminPage() {
                           <div className="min-w-0 flex-1">
                             <div className="flex items-center gap-2">
                               <p className="text-sm font-semibold">{n.title}</p>
-                              {!n.read && <Badge className="rounded-full text-[10px]">New</Badge>}
+                              {!n.read && <Badge className="rounded-full text-xs">New</Badge>}
                             </div>
                             <p className="mt-1 text-sm text-muted-foreground">{n.body}</p>
                             {metadata && (
@@ -434,7 +434,7 @@ export default function AdminPage() {
                                 ))}
                               </div>
                             )}
-                            <p className="mt-2 text-[10px] text-muted-foreground/70">{new Date(n.createdAt).toLocaleString()}</p>
+                            <p className="mt-2 text-xs text-muted-foreground/70">{new Date(n.createdAt).toLocaleString()}</p>
                           </div>
                           {!n.read && (
                             <Button
@@ -496,7 +496,7 @@ export default function AdminPage() {
                           {getUserName(userId).charAt(0).toUpperCase()}
                         </div>
                         <p className="text-sm font-semibold">{getUserName(userId)}</p>
-                        <Badge variant="secondary" className="rounded-full text-[10px]">{msgs.length} messages</Badge>
+                        <Badge variant="secondary" className="rounded-full text-xs">{msgs.length} messages</Badge>
                       </div>
                       <Button
                         size="sm"
@@ -604,7 +604,7 @@ export default function AdminPage() {
                       <div>
                         <div className="flex items-center gap-2">
                           <p className="text-sm font-semibold">{b.title}</p>
-                          <Badge variant={b.active ? "default" : "secondary"} className="rounded-full text-[10px]">
+                          <Badge variant={b.active ? "default" : "secondary"} className="rounded-full text-xs">
                             {b.active ? "Active" : "Inactive"}
                           </Badge>
                         </div>
@@ -934,12 +934,12 @@ function SmsForm({
                     onChange={() => togglePatient(p.id)}
                     className="h-4 w-4 rounded border-muted-foreground/30 accent-primary"
                   />
-                  <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-[10px] font-bold text-primary">
+                  <div className="grid h-7 w-7 shrink-0 place-items-center rounded-full bg-primary/10 text-xs font-bold text-primary">
                     {(p.name || p.username).charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-medium">{p.name || p.username}</p>
-                    <p className="truncate text-[10px] text-muted-foreground">{p.phone}</p>
+                    <p className="truncate text-xs text-muted-foreground">{p.phone}</p>
                   </div>
                 </label>
               ))

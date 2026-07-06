@@ -11,6 +11,8 @@ build
 uploads/*
 !uploads/.gitkeep
 *.log
+*.db
+*.sqlite
 .replit
 replit.md
 .vscode

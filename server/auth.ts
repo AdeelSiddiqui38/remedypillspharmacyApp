@@ -6,6 +6,8 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
+import { authLimiter } from "./security";
+import { z } from "zod";
 import { User as SelectUser, insertUserSchema } from "@shared/schema";
 
 declare global {
@@ -22,14 +24,24 @@ const SESSION_MAX_AGE = 30 * 60 * 1000;
 // Only these fields can be set by a self-registering user. Excludes role,
 // provider, providerId, and tracking fields to prevent privilege escalation
 // via mass assignment.
-const registrationSchema = insertUserSchema.pick({
-  username: true,
-  password: true,
-  name: true,
-  email: true,
-  phone: true,
-  dob: true,
-});
+const registrationSchema = insertUserSchema
+  .pick({
+    username: true,
+    password: true,
+    name: true,
+    email: true,
+    phone: true,
+    dob: true,
+  })
+  .extend({
+    username: z.string().trim().min(3, "Username must be at least 3 characters").max(64),
+    password: z
+      .string()
+      .min(8, "Password must be at least 8 characters")
+      .max(128)
+      .regex(/[A-Za-z]/, "Password must contain a letter")
+      .regex(/[0-9]/, "Password must contain a number"),
+  });
 
 export function sanitizeUser(user: SelectUser): Omit<SelectUser, "password"> {
   const { password, ...safe } = user;
@@ -108,6 +120,7 @@ export function setupAuth(app: Express) {
     resave: false,
     saveUninitialized: false,
     store: storage.sessionStore,
+    rolling: true, // refresh the 30-minute inactivity window on each request
     cookie: {
       maxAge: SESSION_MAX_AGE,
       httpOnly: true,
@@ -166,11 +179,10 @@ export function setupAuth(app: Express) {
           await storage.updateUserLoginTracking(user.id, {
             failedLoginAttempts: attempts,
           });
-          const remaining = MAX_FAILED_ATTEMPTS - attempts;
+          // Same message as the unknown-username path so responses don't
+          // reveal which usernames exist (username enumeration).
           return done(null, false, {
-            message: `Invalid password. ${remaining} attempt${
-              remaining !== 1 ? "s" : ""
-            } remaining.`,
+            message: "Invalid username or password",
           });
         }
 
@@ -226,11 +238,12 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/register", async (req, res, next) => {
+  app.post("/api/register", authLimiter, async (req, res, next) => {
     try {
       const parsed = registrationSchema.safeParse(req.body);
       if (!parsed.success) {
-        return res.status(400).json({ message: parsed.error.message });
+        const first = parsed.error.issues[0];
+        return res.status(400).json({ message: first?.message || "Invalid registration data" });
       }
 
       const existingUser = await storage.getUserByUsername(parsed.data.username);
@@ -263,7 +276,7 @@ export function setupAuth(app: Express) {
     }
   });
 
-  app.post("/api/login", (req, res, next) => {
+  app.post("/api/login", authLimiter, (req, res, next) => {
     passport.authenticate("local", (err: any, user: any, info: any) => {
       if (err) return next(err);
       if (!user) {
@@ -305,7 +318,7 @@ export function setupAuth(app: Express) {
     res.json(sanitizeUser(req.user as SelectUser));
   });
 
-  app.post("/api/account/change-password", requireAuth, async (req, res) => {
+  app.post("/api/account/change-password", authLimiter, requireAuth, async (req, res) => {
     const { currentPassword, newPassword } = req.body;
     if (!currentPassword || !newPassword) {
       return res.status(400).json({ message: "currentPassword and newPassword are required" });

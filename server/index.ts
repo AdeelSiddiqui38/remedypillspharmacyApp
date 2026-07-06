@@ -1,6 +1,7 @@
 import "dotenv/config";
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
+import { securityHeaders, apiLimiter } from "./security";
 import { serveStatic } from "./static";
 import { createServer } from "http";
 import { seedAdminUser } from "./seed-admin";
@@ -35,6 +36,10 @@ try {
 const app = express();
 const httpServer = createServer(app);
 
+// Security headers (helmet) + global API rate limit.
+app.use(securityHeaders);
+app.use("/api", apiLimiter);
+
 declare module "http" {
   interface IncomingMessage {
     rawBody: unknown;
@@ -62,28 +67,19 @@ export function log(message: string, source = "express") {
   console.log(`${formattedTime} [${source}] ${message}`);
 }
 
+// Request logging. Deliberately logs ONLY method/path/status/duration —
+// never response bodies. This is a healthcare app: response payloads contain
+// PHI (prescriptions, health logs, patient contact details) and must not be
+// written to server logs.
 app.use((req, res, next) => {
   const start = Date.now();
   const p = req.path;
-  let capturedJsonResponse: Record<string, any> | undefined = undefined;
-
-  const originalResJson = res.json;
-  res.json = function (bodyJson, ...args) {
-    capturedJsonResponse = bodyJson;
-    return originalResJson.apply(res, [bodyJson, ...args]);
-  };
-
   res.on("finish", () => {
     const duration = Date.now() - start;
     if (p.startsWith("/api")) {
-      let logLine = `${req.method} ${p} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-      log(logLine);
+      log(`${req.method} ${p} ${res.statusCode} in ${duration}ms`);
     }
   });
-
   next();
 });
 

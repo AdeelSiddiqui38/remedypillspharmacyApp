@@ -5,6 +5,7 @@ import crypto from "crypto";
 import { storage } from "./storage";
 import { setupAuth, requireAuth, requireAdmin, hashPassword, sanitizeUser } from "./auth";
 import { sendSmsToPatients } from "./twilio";
+import { messagingLimiter } from "./security";
 import { sendTransferEmail, sendAppointmentCancellation } from "./email";
 import { uploadFile } from "./object-storage";
 import { insertCalorieLogSchema } from "@shared/schema";
@@ -24,6 +25,15 @@ const upload = multer({
     }
   },
 });
+// Return the first human-readable validation message instead of the raw
+// ZodError JSON blob (which leaks schema internals and is unreadable to users).
+function zodMessage(error: { issues: Array<{ message: string }> }): string {
+  return error.issues[0]?.message || "Invalid data";
+}
+
+const PRESCRIPTION_STATUSES = new Set(["pending", "processing", "ready", "picked_up", "cancelled"]);
+const APPOINTMENT_STATUSES = new Set(["upcoming", "confirmed", "completed", "cancelled", "no_show"]);
+
 import {
   insertPrescriptionSchema,
   insertReminderSchema,
@@ -63,7 +73,7 @@ export async function registerRoutes(
       consentAttestedAt: new Date().toISOString(),
       createdAt: new Date().toISOString(),
     });
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+    if (!parsed.success) return res.status(400).json({ message: zodMessage(parsed.error) });
     const created = await storage.createFamilyMember(parsed.data);
     res.status(201).json(created);
   });
@@ -95,7 +105,7 @@ export async function registerRoutes(
       }
     }
     const parsed = insertPrescriptionSchema.safeParse({ ...req.body, userId: req.user!.id });
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+    if (!parsed.success) return res.status(400).json({ message: zodMessage(parsed.error) });
     const created = await storage.createPrescription(parsed.data);
     res.status(201).json(created);
   });
@@ -103,6 +113,7 @@ export async function registerRoutes(
   app.patch("/api/prescriptions/:id/status", requireAuth, async (req, res) => {
     const { status } = req.body;
     if (!status) return res.status(400).json({ message: "status is required" });
+    if (!PRESCRIPTION_STATUSES.has(status)) return res.status(400).json({ message: "Invalid status" });
     const p = await storage.getPrescription(req.params.id);
     if (!p || p.userId !== req.user!.id) return res.status(404).json({ message: "Not found" });
     const updated = await storage.updatePrescriptionStatus(req.params.id, status);
@@ -151,7 +162,7 @@ export async function registerRoutes(
 
   app.post("/api/reminders", requireAuth, async (req, res) => {
     const parsed = insertReminderSchema.safeParse({ ...req.body, userId: req.user!.id });
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+    if (!parsed.success) return res.status(400).json({ message: zodMessage(parsed.error) });
     const created = await storage.createReminder(parsed.data);
     res.status(201).json(created);
   });
@@ -252,7 +263,7 @@ export async function registerRoutes(
 
   app.post("/api/appointments", requireAuth, async (req, res) => {
     const parsed = insertAppointmentSchema.safeParse({ ...req.body, userId: req.user!.id });
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+    if (!parsed.success) return res.status(400).json({ message: zodMessage(parsed.error) });
     const created = await storage.createAppointment(parsed.data);
     res.status(201).json(created);
   });
@@ -260,6 +271,7 @@ export async function registerRoutes(
   app.patch("/api/appointments/:id/status", requireAuth, async (req, res) => {
     const { status } = req.body;
     if (!status) return res.status(400).json({ message: "status is required" });
+    if (!APPOINTMENT_STATUSES.has(status)) return res.status(400).json({ message: "Invalid status" });
     const a = await storage.getAppointment(req.params.id);
     if (!a || a.userId !== req.user!.id) return res.status(404).json({ message: "Not found" });
     const updated = await storage.updateAppointmentStatus(req.params.id, status);
@@ -288,12 +300,12 @@ export async function registerRoutes(
 
   app.post("/api/messages", requireAuth, async (req, res) => {
     const parsed = insertMessageSchema.safeParse({ ...req.body, userId: req.user!.id });
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+    if (!parsed.success) return res.status(400).json({ message: zodMessage(parsed.error) });
     const created = await storage.createMessage(parsed.data);
     res.status(201).json(created);
   });
 
-  app.post("/api/transfer-request", requireAuth, async (req, res) => {
+  app.post("/api/transfer-request", messagingLimiter, requireAuth, async (req, res) => {
     const { firstName, lastName, dob, phone, email, pharmacyName, pharmacyPhone, pharmacyFax, medicationName, rxNumber, notes } = req.body;
     if (!firstName || !lastName || !dob || !phone || !pharmacyName || !pharmacyPhone) {
       return res.status(400).json({ message: "Please fill in all required fields" });
@@ -334,7 +346,7 @@ export async function registerRoutes(
 
   app.post("/api/health-logs", requireAuth, async (req, res) => {
     const parsed = insertHealthLogSchema.safeParse({ ...req.body, userId: req.user!.id });
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+    if (!parsed.success) return res.status(400).json({ message: zodMessage(parsed.error) });
     const created = await storage.createHealthLog(parsed.data);
     res.status(201).json(created);
   });
@@ -427,6 +439,7 @@ export async function registerRoutes(
   app.patch("/api/admin/prescriptions/:id/status", requireAdmin, async (req, res) => {
     const { status, pickupTime } = req.body;
     if (!status) return res.status(400).json({ message: "status is required" });
+    if (!PRESCRIPTION_STATUSES.has(status)) return res.status(400).json({ message: "Invalid status" });
     const data: Record<string, any> = { status };
     if (pickupTime !== undefined) data.pickupTime = pickupTime;
     const updated = await storage.updatePrescription(req.params.id, data);
@@ -436,7 +449,7 @@ export async function registerRoutes(
 
   app.post("/api/admin/prescriptions", requireAdmin, async (req, res) => {
     const parsed = insertPrescriptionSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+    if (!parsed.success) return res.status(400).json({ message: zodMessage(parsed.error) });
     const created = await storage.createPrescription(parsed.data);
     res.status(201).json(created);
   });
@@ -449,6 +462,7 @@ export async function registerRoutes(
   app.patch("/api/admin/appointments/:id/status", requireAdmin, async (req, res) => {
     const { status } = req.body;
     if (!status) return res.status(400).json({ message: "status is required" });
+    if (!APPOINTMENT_STATUSES.has(status)) return res.status(400).json({ message: "Invalid status" });
     const appt = await storage.getAppointment(req.params.id);
     if (!appt) return res.status(404).json({ message: "Not found" });
     const updated = await storage.updateAppointmentStatus(req.params.id, status);
@@ -475,7 +489,7 @@ export async function registerRoutes(
 
   app.post("/api/admin/messages", requireAdmin, async (req, res) => {
     const parsed = insertMessageSchema.safeParse(req.body);
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+    if (!parsed.success) return res.status(400).json({ message: zodMessage(parsed.error) });
     const created = await storage.createMessage(parsed.data);
     res.status(201).json(created);
   });
@@ -530,7 +544,7 @@ export async function registerRoutes(
 
   app.post("/api/calorie-logs", requireAuth, async (req, res) => {
     const parsed = insertCalorieLogSchema.safeParse({ ...req.body, userId: req.user!.id });
-    if (!parsed.success) return res.status(400).json({ message: parsed.error.message });
+    if (!parsed.success) return res.status(400).json({ message: zodMessage(parsed.error) });
     const created = await storage.createCalorieLog(parsed.data);
     res.status(201).json(created);
   });
@@ -627,7 +641,23 @@ export async function registerRoutes(
     // mediaUrl now comes from the Spaces upload endpoint as an already-absolute
     // URL (e.g. https://bucket.tor1.digitaloceanspaces.com/...), which Twilio
     // requires for MMS media anyway.
-    const absoluteMediaUrl: string | undefined = mediaUrl || undefined;
+    let absoluteMediaUrl: string | undefined = undefined;
+    if (mediaUrl) {
+      try {
+        const u = new URL(mediaUrl);
+        const allowedHost = process.env.SPACES_BUCKET
+          ? `${process.env.SPACES_BUCKET}.${process.env.SPACES_REGION || "tor1"}.digitaloceanspaces.com`
+          : null;
+        const hostOk = u.protocol === "https:" &&
+          (allowedHost ? u.hostname === allowedHost : u.hostname.endsWith(".digitaloceanspaces.com"));
+        if (!hostOk) {
+          return res.status(400).json({ message: "Media URL must point to the pharmacy media storage" });
+        }
+        absoluteMediaUrl = u.toString();
+      } catch {
+        return res.status(400).json({ message: "Invalid media URL" });
+      }
+    }
 
     try {
       const result = await sendSmsToPatients(patientsWithPhone, message.trim(), absoluteMediaUrl);
@@ -643,14 +673,16 @@ export async function registerRoutes(
   // turns them into in-app notifications for admin/pharmacist accounts.
   // Unauthenticated and reachable from the public internet, so it's gated by
   // a shared secret instead of a user session.
-  app.post("/api/integrations/contact-webhook", async (req, res) => {
+  app.post("/api/integrations/contact-webhook", messagingLimiter, async (req, res) => {
     const configuredSecret = process.env.CONTACT_WEBHOOK_SECRET;
     if (!configuredSecret) {
       console.error("CONTACT_WEBHOOK_SECRET is not configured; rejecting contact webhook");
       return res.status(503).json({ message: "Webhook not configured" });
     }
 
-    const supplied = (req.query.secret as string) || (req.headers["x-webhook-secret"] as string) || "";
+    // Header only — secrets in query strings get captured by proxy and CDN
+    // access logs. Configure Elementor to send an X-Webhook-Secret header.
+    const supplied = (req.headers["x-webhook-secret"] as string) || "";
     const suppliedBuf = Buffer.from(supplied);
     const expectedBuf = Buffer.from(configuredSecret);
     const valid = suppliedBuf.length === expectedBuf.length && crypto.timingSafeEqual(suppliedBuf, expectedBuf);
