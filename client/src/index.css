@@ -4,6 +4,16 @@
 @custom-variant dark (&:is(.dark *));
 
 @theme inline {
+  /* Senior-friendly type scale: raise the floor of the smallest sizes.
+     Patients at this pharmacy skew older — 12px body text fails them.
+     These override Tailwind's defaults everywhere text-xs/sm/base is used. */
+  --text-xs: 0.84375rem;      /* 13.5px, was 12px */
+  --text-xs--line-height: 1.35;
+  --text-sm: 0.9375rem;       /* 15px, was 14px */
+  --text-sm--line-height: 1.45;
+  --text-base: 1.0625rem;     /* 17px, was 16px */
+  --text-base--line-height: 1.5;
+
   --radius-sm: calc(var(--radius) - 4px);
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
@@ -120,7 +130,7 @@
 
   --muted: 186 22% 95%;
 
-  --muted-foreground: 215 16% 40%;
+  --muted-foreground: 215 16% 34%;
 
   --accent: 186 90% 38%;
 
@@ -142,14 +152,16 @@
   --font-serif: Georgia, serif;
   --font-mono: Menlo, monospace;
   --radius: .5rem; /* 8px */
-  --shadow-2xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00); /*replace with H S L */
-  --shadow-xs: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00); /*replace with H S L */
-  --shadow-sm: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 1px 2px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-md: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 2px 4px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-lg: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 4px 6px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00), 0px 8px 10px -1px hsl(202.8169 89.1213% 53.1373% / 0.00);
-  --shadow-2xl: 0px 2px 0px 0px hsl(202.8169 89.1213% 53.1373% / 0.00);
+  /* Soft, teal-tinted elevation (previous tokens all had 0.00 alpha and
+     rendered no shadow at all — the UI looked flat). */
+  --shadow-2xs: 0px 1px 2px 0px hsl(195 60% 30% / 0.05);
+  --shadow-xs: 0px 1px 2px 0px hsl(195 60% 30% / 0.06);
+  --shadow-sm: 0px 1px 2px 0px hsl(195 60% 30% / 0.06), 0px 1px 3px -1px hsl(195 60% 30% / 0.08);
+  --shadow: 0px 1px 3px 0px hsl(195 60% 30% / 0.07), 0px 2px 4px -1px hsl(195 60% 30% / 0.08);
+  --shadow-md: 0px 2px 4px 0px hsl(195 60% 30% / 0.07), 0px 4px 8px -2px hsl(195 60% 30% / 0.09);
+  --shadow-lg: 0px 4px 8px 0px hsl(195 60% 30% / 0.08), 0px 8px 16px -4px hsl(195 60% 30% / 0.10);
+  --shadow-xl: 0px 8px 16px 0px hsl(195 60% 30% / 0.09), 0px 16px 32px -8px hsl(195 60% 30% / 0.12);
+  --shadow-2xl: 0px 16px 40px -8px hsl(195 60% 30% / 0.16);
   --tracking-normal: 0em;
   --spacing: 0.25rem;
 
@@ -274,6 +286,16 @@
   }
   body {
     @apply font-sans antialiased bg-background text-foreground;
+    -webkit-tap-highlight-color: transparent;
+  }
+  /* Respect vestibular/motion sensitivity — common in older users. */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
   }
 }
 

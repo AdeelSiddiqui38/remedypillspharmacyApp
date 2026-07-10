@@ -321,7 +321,7 @@ function TopBar({
           >
             <Bell className="h-5 w-5" />
             {unreadCount > 0 && (
-              <span className="absolute -right-0.5 -top-0.5 grid h-5 w-5 place-items-center rounded-full bg-red-500 text-[10px] font-bold text-white ring-2 ring-[hsl(186,86%,30%)]" data-testid="badge-notification-count">
+              <span className="absolute -right-0.5 -top-0.5 grid h-5 w-5 place-items-center rounded-full bg-red-500 text-xs font-bold text-white ring-2 ring-[hsl(186,86%,30%)]" data-testid="badge-notification-count">
                 {unreadCount > 9 ? "9+" : unreadCount}
               </span>
             )}
@@ -354,12 +354,12 @@ function TopBar({
 
 function BottomNav({ tab, setTab }: { tab: TabType; setTab: (t: TabType) => void }) {
   const items: Array<{ id: TabType; label: string; icon: React.ReactNode; activeIcon: React.ReactNode }> = [
-    { id: "home", label: "Home", icon: <Home className="h-5 w-5" />, activeIcon: <Home className="h-5 w-5" /> },
-    { id: "prescriptions", label: "Rx", icon: <Pill className="h-5 w-5" />, activeIcon: <Pill className="h-5 w-5" /> },
-    { id: "reminders", label: "Reminders", icon: <Bell className="h-5 w-5" />, activeIcon: <Bell className="h-5 w-5" /> },
-    { id: "appointments", label: "Care", icon: <Calendar className="h-5 w-5" />, activeIcon: <Calendar className="h-5 w-5" /> },
-    { id: "health", label: "Health", icon: <Activity className="h-5 w-5" />, activeIcon: <Activity className="h-5 w-5" /> },
-    { id: "account", label: "Account", icon: <User className="h-5 w-5" />, activeIcon: <User className="h-5 w-5" /> },
+    { id: "home", label: "Home", icon: <Home className="h-6 w-6" />, activeIcon: <Home className="h-6 w-6" /> },
+    { id: "prescriptions", label: "Meds", icon: <Pill className="h-6 w-6" />, activeIcon: <Pill className="h-6 w-6" /> },
+    { id: "reminders", label: "Reminders", icon: <Bell className="h-6 w-6" />, activeIcon: <Bell className="h-6 w-6" /> },
+    { id: "appointments", label: "Care", icon: <Calendar className="h-6 w-6" />, activeIcon: <Calendar className="h-6 w-6" /> },
+    { id: "health", label: "Health", icon: <Activity className="h-6 w-6" />, activeIcon: <Activity className="h-6 w-6" /> },
+    { id: "account", label: "Account", icon: <User className="h-6 w-6" />, activeIcon: <User className="h-6 w-6" /> },
   ];
 
   return (
@@ -372,9 +372,13 @@ function BottomNav({ tab, setTab }: { tab: TabType; setTab: (t: TabType) => void
               key={it.id}
               type="button"
               onClick={() => setTab(it.id)}
+              aria-label={it.label}
+              aria-current={active ? "page" : undefined}
               className={cn(
-                "flex flex-col items-center gap-0.5 px-3 py-1.5 text-[11px] font-medium transition-colors",
-                active ? "text-[hsl(186,86%,30%)]" : "text-gray-400 hover:text-gray-600",
+                "flex min-h-12 min-w-14 flex-col items-center justify-center gap-0.5 rounded-lg px-2 py-1.5 text-xs font-semibold transition-colors",
+                active
+                  ? "text-[hsl(186,86%,30%)] bg-[hsl(186,86%,30%)]/8"
+                  : "text-gray-500 hover:text-gray-700",
               )}
               data-testid={`tab-${it.id}`}
             >
@@ -977,7 +981,7 @@ export default function PharmacyApp() {
                       <div key={m.id} className={cn("flex", isUser ? "justify-end" : "justify-start")} data-testid={`message-${m.id}`}>
                         <div className={cn("max-w-[78%] rounded-2xl px-4 py-3 text-sm shadow-sm", isUser ? "bg-primary text-primary-foreground" : "bg-muted text-foreground")}>
                           <p>{m.text}</p>
-                          <p className="mt-1 text-[11px] opacity-80">{new Date(m.timestamp).toLocaleString()}</p>
+                          <p className="mt-1 text-xs opacity-80">{new Date(m.timestamp).toLocaleString()}</p>
                         </div>
                       </div>
                     );
@@ -1079,7 +1083,7 @@ export default function PharmacyApp() {
                     <div className="flex-1">
                       <p className="text-sm font-semibold">{n.title}</p>
                       <p className="mt-0.5 text-xs text-muted-foreground">{n.body}</p>
-                      <p className="mt-1 text-[11px] text-muted-foreground/70">{new Date(n.createdAt).toLocaleString()}</p>
+                      <p className="mt-1 text-xs text-muted-foreground/70">{new Date(n.createdAt).toLocaleString()}</p>
                     </div>
                     {!n.read && <span className="mt-1 h-2 w-2 rounded-full bg-primary" />}
                   </div>
@@ -1570,7 +1574,7 @@ function TimeSlotPicker({ date, selectedTime, onSelectTime }: { date: string; se
         <p className="text-xs font-semibold text-muted-foreground">
           {data.day} &middot; {data.hours}
         </p>
-        <Badge variant="outline" className="rounded-full text-[10px]">{data.slots.length} available</Badge>
+        <Badge variant="outline" className="rounded-full text-xs">{data.slots.length} available</Badge>
       </div>
       <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
         {data.slots.map(slot => (
@@ -1629,7 +1633,7 @@ function EditAppointmentForm({
           <SelectContent>
             {Object.entries(grouped).map(([cat, items]) => (
               <div key={cat}>
-                <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{cat}</p>
+                <p className="px-2 py-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">{cat}</p>
                 {items.map((s) => (
                   <SelectItem key={s.value} value={s.value}>{s.label}</SelectItem>
                 ))}
@@ -2055,20 +2059,20 @@ function CalorieTracker() {
     <div className="space-y-4">
       <div className="grid gap-3 sm:grid-cols-4">
         <div className="rounded-2xl border border-orange-200 bg-orange-50/50 p-3 text-center">
-          <p className="text-[10px] font-semibold uppercase text-orange-600">Today's Calories</p>
+          <p className="text-xs font-semibold uppercase text-orange-600">Today's Calories</p>
           <p className="mt-1 text-2xl font-bold text-orange-600" data-testid="text-today-calories">{Math.round(todayTotal)}</p>
-          <p className="text-[10px] text-muted-foreground">kcal</p>
+          <p className="text-xs text-muted-foreground">kcal</p>
         </div>
         <div className="rounded-2xl border bg-blue-50/50 p-3 text-center">
-          <p className="text-[10px] font-semibold uppercase text-blue-600">Protein</p>
+          <p className="text-xs font-semibold uppercase text-blue-600">Protein</p>
           <p className="mt-1 text-lg font-bold text-blue-600">{Math.round(todayProtein)}g</p>
         </div>
         <div className="rounded-2xl border bg-amber-50/50 p-3 text-center">
-          <p className="text-[10px] font-semibold uppercase text-amber-600">Carbs</p>
+          <p className="text-xs font-semibold uppercase text-amber-600">Carbs</p>
           <p className="mt-1 text-lg font-bold text-amber-600">{Math.round(todayCarbs)}g</p>
         </div>
         <div className="rounded-2xl border bg-rose-50/50 p-3 text-center">
-          <p className="text-[10px] font-semibold uppercase text-rose-600">Fat</p>
+          <p className="text-xs font-semibold uppercase text-rose-600">Fat</p>
           <p className="mt-1 text-lg font-bold text-rose-600">{Math.round(todayFat)}g</p>
         </div>
       </div>
@@ -2097,12 +2101,12 @@ function CalorieTracker() {
             <div key={log.id} className="flex items-start justify-between rounded-2xl border border-gray-100 bg-gray-50 p-3" data-testid={`calorie-log-${log.id}`}>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="rounded-full text-[10px]">{mealLabels[log.mealType] || log.mealType}</Badge>
+                  <Badge variant="outline" className="rounded-full text-xs">{mealLabels[log.mealType] || log.mealType}</Badge>
                   <span className="text-sm font-bold text-orange-600">{Math.round(log.totalCalories)} kcal</span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">{log.foodItems}</p>
                 {(log.protein || log.carbs || log.fat) && (
-                  <p className="mt-1 text-[10px] text-muted-foreground">
+                  <p className="mt-1 text-xs text-muted-foreground">
                     P: {Math.round(log.protein || 0)}g | C: {Math.round(log.carbs || 0)}g | F: {Math.round(log.fat || 0)}g
                   </p>
                 )}
@@ -2122,9 +2126,9 @@ function CalorieTracker() {
             <div key={log.id} className="flex items-start justify-between rounded-2xl border border-gray-100 bg-gray-50 p-3" data-testid={`calorie-log-${log.id}`}>
               <div className="flex-1">
                 <div className="flex items-center gap-2">
-                  <Badge variant="outline" className="rounded-full text-[10px]">{mealLabels[log.mealType] || log.mealType}</Badge>
+                  <Badge variant="outline" className="rounded-full text-xs">{mealLabels[log.mealType] || log.mealType}</Badge>
                   <span className="text-sm font-bold text-orange-600">{Math.round(log.totalCalories)} kcal</span>
-                  <span className="text-[10px] text-muted-foreground">{new Date(log.loggedAt).toLocaleDateString("en-CA", { month: "short", day: "numeric" })}</span>
+                  <span className="text-xs text-muted-foreground">{new Date(log.loggedAt).toLocaleDateString("en-CA", { month: "short", day: "numeric" })}</span>
                 </div>
                 <p className="mt-1 text-xs text-muted-foreground">{log.foodItems}</p>
               </div>
@@ -2234,19 +2238,19 @@ function CalorieTracker() {
               <div className="grid grid-cols-4 gap-2">
                 <div className="rounded-2xl bg-orange-50 p-2 text-center">
                   <p className="text-lg font-bold text-orange-600">{Math.round(analysisResult.totalCalories)}</p>
-                  <p className="text-[10px] text-muted-foreground">kcal</p>
+                  <p className="text-xs text-muted-foreground">kcal</p>
                 </div>
                 <div className="rounded-2xl bg-blue-50 p-2 text-center">
                   <p className="text-lg font-bold text-blue-600">{Math.round(analysisResult.totalProtein)}g</p>
-                  <p className="text-[10px] text-muted-foreground">Protein</p>
+                  <p className="text-xs text-muted-foreground">Protein</p>
                 </div>
                 <div className="rounded-2xl bg-amber-50 p-2 text-center">
                   <p className="text-lg font-bold text-amber-600">{Math.round(analysisResult.totalCarbs)}g</p>
-                  <p className="text-[10px] text-muted-foreground">Carbs</p>
+                  <p className="text-xs text-muted-foreground">Carbs</p>
                 </div>
                 <div className="rounded-2xl bg-rose-50 p-2 text-center">
                   <p className="text-lg font-bold text-rose-600">{Math.round(analysisResult.totalFat)}g</p>
-                  <p className="text-[10px] text-muted-foreground">Fat</p>
+                  <p className="text-xs text-muted-foreground">Fat</p>
                 </div>
               </div>
 
@@ -2256,11 +2260,11 @@ function CalorieTracker() {
                     <div key={i} className="flex items-center justify-between rounded-xl border bg-background/60 px-3 py-2" data-testid={`food-item-${i}`}>
                       <div>
                         <p className="text-sm font-semibold">{food.name}</p>
-                        <p className="text-[10px] text-muted-foreground">{food.portion}</p>
+                        <p className="text-xs text-muted-foreground">{food.portion}</p>
                       </div>
                       <div className="text-right">
                         <p className="text-sm font-bold text-orange-600">{Math.round(food.calories)} kcal</p>
-                        <p className="text-[10px] text-muted-foreground">P:{Math.round(food.protein)} C:{Math.round(food.carbs)} F:{Math.round(food.fat)}</p>
+                        <p className="text-xs text-muted-foreground">P:{Math.round(food.protein)} C:{Math.round(food.carbs)} F:{Math.round(food.fat)}</p>
                       </div>
                     </div>
                   ))}
@@ -2689,7 +2693,7 @@ function AccountTab({
           <div className="rounded-2xl border border-gray-100 bg-gray-50 p-4 space-y-2">
             <div className="flex items-center justify-between">
               <p className="text-sm font-semibold">Digital Health Consent</p>
-              <Badge variant={user.consentGiven ? "default" : "secondary"} className="rounded-full text-[10px]" data-testid="badge-consent-status">
+              <Badge variant={user.consentGiven ? "default" : "secondary"} className="rounded-full text-xs" data-testid="badge-consent-status">
                 {user.consentGiven ? "Active" : "Not Given"}
               </Badge>
             </div>
@@ -2857,7 +2861,7 @@ function BookingForm({ onBook }: { onBook: (service: string, date: string, time:
           <SelectContent>
             {Object.entries(grouped).map(([cat, items]) => (
               <div key={cat}>
-                <p className="px-2 py-1 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">{cat}</p>
+                <p className="px-2 py-1 text-xs font-bold uppercase tracking-wider text-muted-foreground">{cat}</p>
                 {items.map((s) => (
                   <SelectItem key={s.value} value={s.value} data-testid={`option-book-service-${s.value}`}>
                     {s.label} {s.alberta ? "(AB Pharmacist)" : ""}
