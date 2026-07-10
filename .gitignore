@@ -11,9 +11,12 @@ build
 uploads/*
 !uploads/.gitkeep
 *.log
+*.db
+*.sqlite
 .replit
 replit.md
 .vscode
 .claude
 desktop.ini
 client_secret_*.json
+ARCHIVE/
