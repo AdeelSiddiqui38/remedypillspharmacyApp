@@ -57,5 +57,49 @@
       "type": "image/png",
       "purpose": "maskable"
     }
+  ],
+  "screenshots": [
+    {
+      "src": "/screenshots/intro_page.png",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Welcome screen"
+    },
+    {
+      "src": "/screenshots/home.png",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Home — Quick Actions and Services"
+    },
+    {
+      "src": "/screenshots/meds.png",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Medications and Prescriptions"
+    },
+    {
+      "src": "/screenshots/reminder.png",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Medication Reminders"
+    },
+    {
+      "src": "/screenshots/Care.png",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Pharmacy Services and Appointments"
+    },
+    {
+      "src": "/screenshots/Health.png",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Health Tracking"
+    },
+    {
+      "src": "/screenshots/Account.png",
+      "type": "image/png",
+      "form_factor": "narrow",
+      "label": "Account and Profile"
+    }
   ]
 }
