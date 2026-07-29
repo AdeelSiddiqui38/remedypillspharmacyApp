@@ -51,6 +51,71 @@ export async function registerRoutes(
 ): Promise<Server> {
   setupAuth(app);
 
+  // Public privacy policy page (required by Google Play Store)
+  app.get("/privacy-policy", (_req, res) => {
+    res.setHeader("Content-Type", "text/html; charset=utf-8");
+    res.send(`<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Privacy Policy — Remedy Pills Pharmacy</title>
+<style>
+  body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; color: #333; line-height: 1.6; }
+  h1 { color: #16a34a; } h2 { color: #166534; margin-top: 2em; }
+  a { color: #16a34a; }
+</style>
+</head>
+<body>
+<h1>Privacy Policy</h1>
+<p><strong>Remedy Pills Pharmacy</strong> ("we", "us", or "our") operates the RemedyPills Pharmacy mobile application (the "App"). This page informs you of our policies regarding the collection, use, and disclosure of personal information when you use our App.</p>
+<p><em>Last updated: July 29, 2026</em></p>
+
+<h2>Information We Collect</h2>
+<p>We collect the following information to provide and improve our services:</p>
+<ul>
+  <li><strong>Personal information:</strong> Name, email address, and phone number — collected when you create an account, required for account management and communication.</li>
+  <li><strong>Health information:</strong> Prescription details, medication records, and messages exchanged with our pharmacists — collected to fulfil prescription refill requests, set medication reminders, and deliver pharmacy services.</li>
+  <li><strong>Account credentials:</strong> We use Google Sign-In (OAuth 2.0) for authentication. We do not store your Google password.</li>
+</ul>
+
+<h2>How We Use Your Information</h2>
+<ul>
+  <li>To process prescription refill requests and track their status</li>
+  <li>To send medication reminders you have configured</li>
+  <li>To schedule and manage pharmacy service appointments</li>
+  <li>To facilitate secure messaging between you and our pharmacy team</li>
+  <li>To arrange medication delivery to your address</li>
+  <li>To comply with applicable pharmacy and healthcare regulations in Alberta, Canada</li>
+</ul>
+
+<h2>Data Storage and Security</h2>
+<p>Your data is stored securely in Canada on encrypted servers. All data is transmitted over HTTPS (TLS). We do not sell, trade, or otherwise transfer your personal information to outside parties. Health information is shared only with licensed pharmacy staff at Remedy Pills Pharmacy who require it to provide your care.</p>
+
+<h2>Data Retention and Deletion</h2>
+<p>We retain your data for as long as your account is active or as required by law. To request deletion of your account and associated data, email us at <a href="mailto:info@remedypills.ca">info@remedypills.ca</a>. We will process deletion requests within 30 days.</p>
+
+<h2>Third-Party Services</h2>
+<p>The App uses Google Sign-In for authentication. Your use of Google Sign-In is subject to <a href="https://policies.google.com/privacy" target="_blank">Google's Privacy Policy</a>. We do not use any advertising SDKs or share data with advertising networks.</p>
+
+<h2>Children's Privacy</h2>
+<p>The App is intended for users aged 18 and over. We do not knowingly collect personal information from children under 18.</p>
+
+<h2>Changes to This Policy</h2>
+<p>We may update this Privacy Policy from time to time. Changes will be posted on this page with an updated date. Continued use of the App after changes constitutes acceptance of the updated policy.</p>
+
+<h2>Contact Us</h2>
+<p>If you have questions about this Privacy Policy, contact us at:</p>
+<p>
+  <strong>Remedy Pills Pharmacy</strong><br>
+  Unit #135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9<br>
+  Phone: <a href="tel:+14039807003">403-980-7003</a><br>
+  Email: <a href="mailto:info@remedypills.ca">info@remedypills.ca</a>
+</p>
+</body>
+</html>`);
+  });
+
   // ── Patient: Family Members ─────────────────────────────────
   // A family member is a profile managed by the logged-in account holder
   // (e.g. a parent managing a child's prescriptions). They don't get their
