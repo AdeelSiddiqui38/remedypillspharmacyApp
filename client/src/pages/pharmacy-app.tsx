@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast, toast } from "@/hooks/use-toast";
+import BiometricSetting from "@/components/biometric-setting";
 import { Redirect } from "wouter";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -2726,6 +2727,8 @@ function AccountTab({
           </div>
         </CardContent>
       </Card>
+
+      <BiometricSetting />
 
       <Card className="rounded-2xl border-0 bg-white shadow-sm">
         <CardHeader>

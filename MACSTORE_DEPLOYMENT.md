@@ -76,6 +76,8 @@ In Xcode, select the **App** target → **Signing & Capabilities**:
 
 Because `@capacitor/local-notifications` is present, confirm the notifications capability is wired and that the app requests permission at a sensible moment (not on cold launch).
 
+**Face ID (required Info.plist key).** The app now includes a biometric app-lock (`@aparajita/capacitor-biometric-auth`, toggle in Account → Security). For Face ID to work you **must** add the `NSFaceIDUsageDescription` key to `ios/App/App/Info.plist` — Apple rejects/ crashes the app without it. Example value: *"RemedyPills uses Face ID to lock the app so only you can view your prescriptions and health information."* Run `npm install && npx cap sync ios` after pulling this code so the native plugin is installed.
+
 ### 4d. Archive and upload
 
 1. In Xcode's device selector, choose **Any iOS Device (arm64)** (not a simulator).
@@ -159,7 +161,7 @@ This is the Apple equivalent of Google's "WebView wrapper" policy, **and Apple e
 What makes reviewers approve these anyway is visible **native platform integration** — things Safari can't do. In your favor: it's a real, login-gated app for a real business, and you already have `@capacitor/local-notifications`. To materially lower rejection odds before submitting, add native behavior and make it obvious in the demo notes:
 
 - **Local notifications for medication reminders** (already installed) — wire them so reminders fire when the app is closed. High value for patients, unambiguous native functionality. Do this before submitting, not after a rejection.
-- **Biometric login (Face ID / Touch ID)** via a Capacitor biometric plugin — reviewers specifically like seeing biometric APIs. A "unlock with Face ID" option on top of the web login is a strong 4.2 signal.
+- **Biometric login (Face ID / Touch ID)** — **now implemented** via `@aparajita/capacitor-biometric-auth`: an Account → Security toggle that gates the app behind Face ID/Touch ID on every launch and resume (`client/src/lib/biometric-auth.ts`, `client/src/components/biometric-lock.tsx`). Reviewers specifically like seeing biometric APIs, and this protects health data. Remember the `NSFaceIDUsageDescription` Info.plist key above.
 - Optionally **native share** and **haptics** on key actions.
 
 In the **App Review notes**, spell out the native features and where to find them ("Enable medication reminder → notification fires natively even with app closed; login screen offers Face ID"). Reviewers don't always dig, so tell them.

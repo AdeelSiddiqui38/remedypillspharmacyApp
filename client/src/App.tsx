@@ -6,6 +6,7 @@ import { Toaster } from "@/components/ui/toaster";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { AuthProvider } from "@/hooks/use-auth";
 import { ProtectedRoute } from "@/lib/protected-route";
+import { BiometricLock } from "@/components/biometric-lock";
 import NotFound from "@/pages/not-found";
 
 const PharmacyApp = lazy(() => import("@/pages/pharmacy-app"));
@@ -41,7 +42,9 @@ function App() {
       <AuthProvider>
         <TooltipProvider>
           <Toaster />
-          <Router />
+          <BiometricLock>
+            <Router />
+          </BiometricLock>
         </TooltipProvider>
       </AuthProvider>
     </QueryClientProvider>
