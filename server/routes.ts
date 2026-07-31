@@ -68,7 +68,7 @@ export async function registerRoutes(
 </head>
 <body>
 <h1>Privacy Policy</h1>
-<p><strong>Remedy Pills Pharmacy</strong> ("we", "us", or "our") operates the RemedyPills Pharmacy mobile application (the "App"). This page informs you of our policies regarding the collection, use, and disclosure of personal information when you use our App.</p>
+<p><strong>Remedy Pills Pharmacy</strong> ("we", "us", or "our") operates the Remedy Pills Pharmacy mobile application (the "App"). This page informs you of our policies regarding the collection, use, and disclosure of personal information when you use our App.</p>
 <p><em>Last updated: July 29, 2026</em></p>
 
 <h2>Information We Collect</h2>

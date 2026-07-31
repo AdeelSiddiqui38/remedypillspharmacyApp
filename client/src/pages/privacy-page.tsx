@@ -25,7 +25,7 @@ export default function PrivacyPage() {
             <section>
               <h2 className="text-xl font-semibold mb-3">1. Introduction</h2>
               <p className="text-gray-700 leading-relaxed">
-                RemedyPills Pharmacy ("we", "us", "our", or "Company") operates this patient portal application.
+                Remedy Pills Pharmacy ("we", "us", "our", or "Company") operates this patient portal application.
                 As a licensed pharmacy in Alberta, Canada, we are a custodian of health information under
                 Alberta's <strong>Health Information Act (HIA)</strong>, and our handling of personal information
                 more generally is also governed by the federal <strong>Personal Information Protection and
@@ -47,7 +47,7 @@ export default function PrivacyPage() {
 
             <section>
               <h2 className="text-xl font-semibold mb-3">3. Use of Data</h2>
-              <p className="text-gray-700 mb-3">RemedyPills Pharmacy uses the collected data for various purposes:</p>
+              <p className="text-gray-700 mb-3">Remedy Pills Pharmacy uses the collected data for various purposes:</p>
               <ul className="list-disc list-inside space-y-2 text-gray-700">
                 <li>To provide and maintain our service</li>
                 <li>To manage prescriptions and appointments</li>

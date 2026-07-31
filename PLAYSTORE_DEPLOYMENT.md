@@ -1,4 +1,4 @@
-# RemedyPills Pharmacy — Google Play Store Deployment Guide
+# Remedy Pills Pharmacy — Google Play Store Deployment Guide
 
 Your Android app is a Capacitor shell that loads the live site at `https://app.remedypills.ca`. That means deployment happens in three stages, in this order — the app is an empty screen until the backend is live, and Google's reviewers will open it.
 
@@ -27,7 +27,7 @@ If you deploy under a different domain than `app.remedypills.ca`, update `produc
    | D-U-N-S Number | **24-337-1905** (`243371905`) |
    | Business address | Unit #135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9 |
 
-   Enter the legal entity as **`Remedy Pills Inc`** — it must match the Dun & Bradstreet record exactly. "RemedyPills Pharmacy" is the app/trade name and belongs in the store listing, not the legal entity field. The same D-U-N-S number works for both Google Play and Apple.
+   Enter the legal entity as **`Remedy Pills Inc`** — it must match the Dun & Bradstreet record exactly. "Remedy Pills Pharmacy" is the app/trade name and belongs in the store listing, not the legal entity field. The same D-U-N-S number works for both Google Play and Apple.
 3. Complete identity verification. This can take a few days — start it early and do Stage 1 while you wait.
 
 ## Stage 3 — Build, sign, and submit
@@ -67,7 +67,7 @@ Test the release build on a real device first: `./gradlew assembleRelease` produ
 
 ### 3c. Create the app in Play Console
 
-App name **RemedyPills Pharmacy**, default language English (Canada), type App, Free.
+App name **Remedy Pills Pharmacy**, default language English (Canada), type App, Free.
 
 Then work through the **Set up your app** checklist. The answers for this app:
 
@@ -100,10 +100,10 @@ Then work through the **Set up your app** checklist. The answers for this app:
 Ready-to-paste copy — edit freely:
 
 **Short description (80 chars max):**
-"Refills, reminders, and pharmacist appointments from RemedyPills Pharmacy."
+"Refills, reminders, and pharmacist appointments from Remedy Pills Pharmacy."
 
 **Full description:**
-"The official app of RemedyPills Pharmacy. Request prescription refills and track when they're ready for pickup, set medication reminders so you never miss a dose, book appointments with your pharmacist, transfer prescriptions from another pharmacy, message our team directly, and keep simple health logs — blood pressure, glucose, and more. Designed to be easy to read and easy to tap, for patients of every age. Your health information is stored securely in Canada and is never sold or shared."
+"The official app of Remedy Pills Pharmacy. Request prescription refills and track when they're ready for pickup, set medication reminders so you never miss a dose, book appointments with your pharmacist, transfer prescriptions from another pharmacy, message our team directly, and keep simple health logs — blood pressure, glucose, and more. Designed to be easy to read and easy to tap, for patients of every age. Your health information is stored securely in Canada and is never sold or shared."
 
 **Graphics you must prepare:** app icon 512×512 PNG (export from `assets/icon.png`), feature graphic 1024×500, and at least 4 phone screenshots (take them from the release build on a real device or emulator — Pixel 6 size works well). Screenshots of the home, prescriptions, reminders, and appointments tabs would represent the app honestly.
 

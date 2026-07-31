@@ -1,4 +1,4 @@
-# RemedyPills Pharmacy — App Store Submission Pack
+# Remedy Pills Pharmacy — App Store Submission Pack
 
 Everything you need to paste into App Store Connect, pre-written. Work top to bottom.
 Companion to `MACSTORE_DEPLOYMENT.md` (which explains the *why*); this file is the *what to type*.
@@ -39,20 +39,29 @@ Use these exact values when enrolling in the Apple Developer Program.
 | Entity type | Corporation (Canada) |
 | Program cost | US $99/year |
 
-⚠️ **Two names, don't mix them up:**
+⚠️ **Two names — both correct, used in different places. Do not mix them up:**
 
-- **`Remedy Pills Inc`** — the *legal entity*. Use this for enrollment, the D-U-N-S record, tax/banking forms, and the Apple Developer account name. Apple matches it character-for-character against Dun & Bradstreet; a mismatch (e.g. "RemedyPills Pharmacy", "Remedy Pills Inc.", "Remedy Pills Incorporated") gets the application bounced and you start over.
-- **`RemedyPills Pharmacy`** — the *app name / trade name*. Use this for the App Store listing only.
+| | Name | Where it goes |
+|---|---|---|
+| **Legal entity** | `Remedy Pills Inc` | Apple Developer enrollment, D-U-N-S record, tax & banking forms, agreements |
+| **App / trade name** | `Remedy Pills Pharmacy` | App Store listing name, Play listing name, the app itself |
 
-Your App Store **seller name** defaults to the legal entity (`Remedy Pills Inc`). If you'd rather patients see "RemedyPills Pharmacy" on the listing, request a **DBA / trade name** in App Store Connect → Business after enrollment; Apple requires supporting documentation for the alternate name.
+`Remedy Pills Inc` is the registered Alberta corporation (the name on the registry papers D&B required). `Remedy Pills Pharmacy` is the operating/trade name patients know. Apple matches the **legal entity** character-for-character against Dun & Bradstreet — a mismatch ("Remedy Pills Inc.", "Remedy Pills Pharmacy", "Remedy Pills Incorporated") bounces the application and you restart the multi-week review. Enter it exactly as `Remedy Pills Inc`.
 
-Also confirm the address and phone number you give Apple match the D&B record exactly — Apple often verifies by calling the number on file, so make sure it's answered.
+**The app name is unrestricted.** Apple does *not* require your App Store listing name to match the legal entity, so listing the app as **Remedy Pills Pharmacy** — matching Google Play — is straightforward. Just type it in the Name field (§1).
+
+**Seller name — expect `Remedy Pills Inc`.** The "seller"/developer line under the app on the App Store defaults to the legal entity. To display "Remedy Pills Pharmacy" there instead you'd request a DBA/trade name in App Store Connect → Business, and Apple requires an Alberta trade name registration certificate as proof. You currently hold only the Inc. registry papers, so:
+
+- **Recommended:** proceed now, accept `Remedy Pills Inc` as the seller name. It's accurate, patients still see "Remedy Pills Pharmacy" as the app name, and it does not delay launch. This is normal — most incorporated businesses show their legal name as seller.
+- **Optional later:** register the Alberta trade name, then request the DBA. It can be changed after the app is live; it is not worth blocking submission over.
+
+Also confirm the address and phone you give Apple match the D&B record exactly — Apple often verifies by calling the number on file, so make sure it's answered.
 
 ## 1. App information
 
 | Field | Value |
 |---|---|
-| **Name** | RemedyPills Pharmacy |
+| **Name** | Remedy Pills Pharmacy |
 | **Subtitle** (30 max) | Refills, reminders & advice |
 | **Bundle ID** | `ca.remedypills.app` |
 | **SKU** | `remedypills-ios-01` |
@@ -67,12 +76,12 @@ Also confirm the address and phone number you give Apple match the D&B record ex
 
 **Promotional text** (170 max):
 ```
-Request refills, set medication reminders, and book pharmacist appointments — securely, from RemedyPills Pharmacy in Calgary.
+Request refills, set medication reminders, and book pharmacist appointments — securely, from Remedy Pills Pharmacy in Calgary.
 ```
 
 **Description:**
 ```
-RemedyPills Pharmacy puts your Calgary pharmacy in your pocket. Manage prescriptions, stay on top of your medications, and reach a licensed pharmacist — all from one secure app.
+Remedy Pills Pharmacy puts your Calgary pharmacy in your pocket. Manage prescriptions, stay on top of your medications, and reach a licensed pharmacist — all from one secure app.
 
 REFILLS MADE SIMPLE
 Request prescription refills in seconds and track their status. No phone calls, no waiting on hold.
@@ -84,7 +93,7 @@ BOOK APPOINTMENTS
 Schedule consultations, vaccinations, and medication reviews with your pharmacist at a time that suits you.
 
 TRANSFER PRESCRIPTIONS
-Moving to RemedyPills? Transfer prescriptions from another pharmacy right in the app.
+Moving to Remedy Pills? Transfer prescriptions from another pharmacy right in the app.
 
 MESSAGE YOUR PHARMACY
 Ask questions and get answers from our team without a trip to the counter.
@@ -100,7 +109,7 @@ Protect the app with Face ID or Touch ID. Your health information is stored secu
 
 Designed to be easy to read and easy to tap, for patients of every age.
 
-RemedyPills Pharmacy — Unit #135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9
+Remedy Pills Pharmacy — Unit #135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9
 ```
 
 **Keywords** (100 chars, no spaces after commas):
@@ -117,7 +126,7 @@ pharmacy,prescription,refill,medication,reminder,pharmacist,appointment,health,c
 This is your defense against a Guideline 4.2 rejection. Paste verbatim into **Notes**:
 
 ```
-RemedyPills Pharmacy is the official app of a licensed community pharmacy in Calgary, Alberta, Canada. It is not a generic web wrapper — it provides native device functionality that a website cannot:
+Remedy Pills Pharmacy is the official app of a licensed community pharmacy in Calgary, Alberta, Canada. It is not a generic web wrapper — it provides native device functionality that a website cannot:
 
 1. BIOMETRIC APP LOCK (Face ID / Touch ID)
    Where: Account tab > Security > "Require Face ID to open the app"
@@ -145,7 +154,7 @@ never shared with third parties, and never used for advertising or tracking.
 The app contains no advertising or analytics SDKs. Data is stored in Canada.
 Users can request account deletion in-app.
 
-Pharmacy contact: RemedyPills Pharmacy, Unit #135, 246 Nolanridge Crescent NW,
+Pharmacy contact: Remedy Pills Pharmacy, Unit #135, 246 Nolanridge Crescent NW,
 Calgary, AB T3R 1W9.
 ```
 
@@ -186,7 +195,7 @@ In Xcode: run on the simulator, then **Device → Screenshot** (⌘S). Showing t
 ## 6. Build commands (your Mac)
 
 ```bash
-cd ~/Documents/Claude/Projects/RemedyPillsPharmacy_App/app
+cd ~/Documents/Claude/Projects/Remedy PillsPharmacy_App/app
 git pull origin main          # get the biometric + notification work
 npm install                   # installs @aparajita/capacitor-biometric-auth
 CAPACITOR_ENV=production npx cap sync ios

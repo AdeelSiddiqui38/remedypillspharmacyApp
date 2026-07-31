@@ -96,7 +96,7 @@ export async function authenticateBiometric(reason: string): Promise<boolean> {
       // Let the OS fall back to the device passcode if biometrics fail,
       // so a legitimate user is never fully locked out on their own phone.
       allowDeviceCredential: true,
-      androidTitle: "RemedyPills Pharmacy",
+      androidTitle: "Remedy Pills Pharmacy",
       androidSubtitle: reason,
       androidConfirmationRequired: false,
     });

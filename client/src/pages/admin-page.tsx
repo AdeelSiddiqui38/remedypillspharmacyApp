@@ -231,12 +231,12 @@ export default function AdminPage() {
         <header className="mb-6 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="grid h-11 w-11 place-items-center overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-border">
-              <img src={remedyLogo} alt="RemedyPills" className="h-full w-full object-contain p-1" />
+              <img src={remedyLogo} alt="Remedy Pills" className="h-full w-full object-contain p-1" />
             </div>
             <div>
               <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground">ADMIN PORTAL</p>
               <h1 className="text-lg font-semibold tracking-tight" data-testid="text-admin-title">
-                RemedyPills Pharmacy
+                Remedy Pills Pharmacy
               </h1>
             </div>
           </div>

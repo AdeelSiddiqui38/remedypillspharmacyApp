@@ -1,6 +1,6 @@
-# RemedyPills Pharmacy — Mac App Store Deployment Guide
+# Remedy Pills Pharmacy — Mac App Store Deployment Guide
 
-This is the companion to `PLAYSTORE_DEPLOYMENT.md`. It covers getting **RemedyPills Pharmacy** onto the **Mac App Store** using the path you chose: **"iPhone/iPad app made available on Apple Silicon Macs."**
+This is the companion to `PLAYSTORE_DEPLOYMENT.md`. It covers getting **Remedy Pills Pharmacy** onto the **Mac App Store** using the path you chose: **"iPhone/iPad app made available on Apple Silicon Macs."**
 
 Read this first, because it changes how you think about the whole thing:
 
@@ -11,7 +11,7 @@ Two consequences of this choice:
 1. **Apple Silicon only.** The app appears only on M-series Macs running macOS 11+. Intel Macs won't see it. That's fine for a modern pharmacy audience but worth knowing.
 2. **It must pass iOS review first.** The Mac availability is downstream of an approved iOS app. Apple's review (especially Guideline 4.2, below) is stricter than Google's, so plan for that.
 
-Your app is a Capacitor 8 shell (`appId: ca.remedypills.app`, appName **RemedyPills Pharmacy**) that loads the live site `https://app.remedypills.ca`, exactly like the Android build. iOS platform is already scaffolded in `ios/`, and `@capacitor/local-notifications` is already a dependency — that matters for review.
+Your app is a Capacitor 8 shell (`appId: ca.remedypills.app`, appName **Remedy Pills Pharmacy**) that loads the live site `https://app.remedypills.ca`, exactly like the Android build. iOS platform is already scaffolded in `ios/`, and `@capacitor/local-notifications` is already a dependency — that matters for review.
 
 ---
 
@@ -36,7 +36,7 @@ You don't have an account yet, and enrollment is the long pole — start it befo
    | Legal entity name | **Remedy Pills Inc** |
    | D-U-N-S Number | **24-337-1905** (`243371905`) |
 
-   ⚠️ **Enter the legal entity name exactly as `Remedy Pills Inc`** during enrollment — Apple matches it character-for-character against the Dun & Bradstreet record. Do **not** enter "RemedyPills Pharmacy" (the trade/app name) in the legal entity field; a mismatch is the most common cause of enrollment rejection and restarts the review. The address and phone you give Apple must also match the D&B record.
+   ⚠️ **Enter the legal entity name exactly as `Remedy Pills Inc`** during enrollment — Apple matches it character-for-character against the Dun & Bradstreet record. Do **not** enter "Remedy Pills Pharmacy" (the trade/app name) in the legal entity field; a mismatch is the most common cause of enrollment rejection and restarts the review. The address and phone you give Apple must also match the D&B record.
 
    You also need legal authority to bind the organization to Apple's agreement. Total org enrollment commonly takes **1–2 weeks**.
 4. Once enrolled, sign the latest **Paid Apps Agreement** in App Store Connect → Business. **This matters for the Mac step:** Apple only auto-distributes your iOS apps to Apple Silicon Macs after this agreement is signed.
@@ -85,7 +85,7 @@ In Xcode, select the **App** target → **Signing & Capabilities**:
 
 Because `@capacitor/local-notifications` is present, confirm the notifications capability is wired and that the app requests permission at a sensible moment (not on cold launch).
 
-**Face ID (required Info.plist key).** The app now includes a biometric app-lock (`@aparajita/capacitor-biometric-auth`, toggle in Account → Security). For Face ID to work you **must** add the `NSFaceIDUsageDescription` key to `ios/App/App/Info.plist` — Apple rejects/ crashes the app without it. Example value: *"RemedyPills uses Face ID to lock the app so only you can view your prescriptions and health information."* Run `npm install && npx cap sync ios` after pulling this code so the native plugin is installed.
+**Face ID (required Info.plist key).** The app now includes a biometric app-lock (`@aparajita/capacitor-biometric-auth`, toggle in Account → Security). For Face ID to work you **must** add the `NSFaceIDUsageDescription` key to `ios/App/App/Info.plist` — Apple rejects/ crashes the app without it. Example value: *"Remedy Pills uses Face ID to lock the app so only you can view your prescriptions and health information."* Run `npm install && npx cap sync ios` after pulling this code so the native plugin is installed.
 
 ### 4d. Archive and upload
 
@@ -99,7 +99,7 @@ Because `@capacitor/local-notifications` is present, confirm the notifications c
 
 At `appstoreconnect.apple.com` → **My Apps → +** :
 
-- **Platform:** iOS. **Name:** RemedyPills Pharmacy. **Primary language:** English (Canada). **Bundle ID:** `ca.remedypills.app`. **SKU:** any internal string, e.g. `remedypills-ios-01`.
+- **Platform:** iOS. **Name:** Remedy Pills Pharmacy. **Primary language:** English (Canada). **Bundle ID:** `ca.remedypills.app`. **SKU:** any internal string, e.g. `remedypills-ios-01`.
 
 Then complete these sections — the health-app ones are what get scrutinized:
 
@@ -145,12 +145,12 @@ Reuse and lightly adapt the copy from the Play guide:
 
 **Subtitle (30 chars max):** "Refills, reminders & pharmacist"
 
-**Promotional text (170 chars):** "Request refills, set medication reminders, and book pharmacist appointments — securely, from RemedyPills Pharmacy."
+**Promotional text (170 chars):** "Request refills, set medication reminders, and book pharmacist appointments — securely, from Remedy Pills Pharmacy."
 
 **Description:**
-"The official app of RemedyPills Pharmacy. Request prescription refills and track when they're ready for pickup, set medication reminders so you never miss a dose, book appointments with your pharmacist, transfer prescriptions from another pharmacy, message our team directly, and keep simple health logs — blood pressure, glucose, and more. Designed to be easy to read and easy to tap, for patients of every age. Your health information is stored securely in Canada and is never sold or shared."
+"The official app of Remedy Pills Pharmacy. Request prescription refills and track when they're ready for pickup, set medication reminders so you never miss a dose, book appointments with your pharmacist, transfer prescriptions from another pharmacy, message our team directly, and keep simple health logs — blood pressure, glucose, and more. Designed to be easy to read and easy to tap, for patients of every age. Your health information is stored securely in Canada and is never sold or shared."
 
-**Keywords (100 chars, comma-separated):** "pharmacy,prescription,refill,medication,reminder,pharmacist,appointment,health,RemedyPills"
+**Keywords (100 chars, comma-separated):** "pharmacy,prescription,refill,medication,reminder,pharmacist,appointment,health,Remedy Pills"
 
 **Support URL:** a public contact page, e.g. `https://app.remedypills.ca` or a support page. **Marketing URL:** optional.
 

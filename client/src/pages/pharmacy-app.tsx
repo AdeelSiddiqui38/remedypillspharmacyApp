@@ -182,7 +182,7 @@ interface Location {
 }
 
 const PHARMACY_INFO = {
-  name: "RemedyPills Pharmacy",
+  name: "Remedy Pills Pharmacy",
   addressLine1: "Unit # 135, 246 Nolanridge Crescent NW",
   addressLine2: "Calgary, AB",
   postalCode: "T3R 1W9",
@@ -336,7 +336,7 @@ function TopBar({
             data-testid="button-logout"
           >
             <div className="grid h-full w-full place-items-center bg-gradient-to-br from-primary/20 to-primary/5">
-              <img src={remedyLogo} alt="RemedyPills" className="h-7 w-7 object-contain" data-testid="img-remedypills-logo" />
+              <img src={remedyLogo} alt="Remedy Pills" className="h-7 w-7 object-contain" data-testid="img-remedypills-logo" />
             </div>
           </button>
           <Button
@@ -433,7 +433,7 @@ function TransferForm({ onSubmit, isPending }: { onSubmit: (data: TransferFormDa
       >
         <div className="rounded-2xl border border-primary/20 bg-primary/5 p-3">
           <p className="text-xs text-muted-foreground">
-            Fill out this form to transfer your prescription to RemedyPills Pharmacy. We'll contact your current pharmacy and handle everything for you.
+            Fill out this form to transfer your prescription to Remedy Pills Pharmacy. We'll contact your current pharmacy and handle everything for you.
           </p>
         </div>
 
@@ -1162,7 +1162,7 @@ function HomeTab({
   const serviceItems = [
     { label: "Prescription Management", desc: "Upload, track, and manage your prescriptions", icon: <Pill className="h-5 w-5" />, color: "bg-teal-50 text-teal-600", action: onViewAllRx },
     { label: "Book a Service", desc: "Vaccines, minor ailments, and health checks", icon: <Calendar className="h-5 w-5" />, color: "bg-purple-50 text-purple-600", action: onBook },
-    { label: "Transfer Prescription", desc: "Easily move your Rx to RemedyPills", icon: <Share2 className="h-5 w-5" />, color: "bg-orange-50 text-orange-500", action: onTransfer },
+    { label: "Transfer Prescription", desc: "Easily move your Rx to Remedy Pills", icon: <Share2 className="h-5 w-5" />, color: "bg-orange-50 text-orange-500", action: onTransfer },
     { label: "Ask a Pharmacist", desc: "Side effects, drug interactions & guidance", icon: <Stethoscope className="h-5 w-5" />, color: "bg-emerald-50 text-emerald-600", action: onChat },
   ];
 
@@ -2320,8 +2320,8 @@ function ShareAppCard() {
     if (hasShareApi) {
       try {
         await navigator.share({
-          title: "RemedyPills Pharmacy",
-          text: "Manage your prescriptions, book appointments, and track your health with RemedyPills Pharmacy.",
+          title: "Remedy Pills Pharmacy",
+          text: "Manage your prescriptions, book appointments, and track your health with Remedy Pills Pharmacy.",
           url: APP_SHARE_URL,
         });
       } catch {}
@@ -2432,7 +2432,7 @@ function ShareAppCard() {
               />
             </div>
             <p className="text-center text-xs text-muted-foreground">
-              Scan this QR code to open the RemedyPills app
+              Scan this QR code to open the Remedy Pills app
             </p>
             <Button variant="outline" onClick={handleShareSheet} className="rounded-2xl" data-testid="button-qr-share">
               <Share2 className="mr-2 h-4 w-4" />
@@ -2713,7 +2713,7 @@ function AccountTab({
             )}
             <p className="text-xs text-muted-foreground">
               {user.consentGiven
-                ? "You have consented to RemedyPills storing your health information and managing your prescriptions electronically."
+                ? "You have consented to Remedy Pills storing your health information and managing your prescriptions electronically."
                 : "You have not given consent for digital health services. Some features may be limited."}
             </p>
             {user.consentGiven ? (
@@ -3005,9 +3005,9 @@ function PrivacyTermsDialogs({
           <DialogHeader><DialogTitle>Privacy Policy</DialogTitle></DialogHeader>
           <ScrollArea className="max-h-[60vh]">
             <div className="space-y-4 pr-4 text-sm text-muted-foreground">
-              <p className="font-semibold text-foreground">RemedyPills Pharmacy — Privacy Policy</p>
+              <p className="font-semibold text-foreground">Remedy Pills Pharmacy — Privacy Policy</p>
               <p><strong>Effective Date:</strong> February 2026</p>
-              <p>RemedyPills Pharmacy is committed to protecting your personal health information in compliance with Alberta's <strong>Health Information Act (HIA)</strong> and Canada's <strong>PIPEDA</strong>.</p>
+              <p>Remedy Pills Pharmacy is committed to protecting your personal health information in compliance with Alberta's <strong>Health Information Act (HIA)</strong> and Canada's <strong>PIPEDA</strong>.</p>
               <p className="font-semibold text-foreground">Information We Collect</p>
               <ul className="list-disc pl-5 space-y-1 text-xs">
                 <li>Name, date of birth, email, and phone number</li>
@@ -3030,7 +3030,7 @@ function PrivacyTermsDialogs({
                 <li>File a complaint with Alberta's Privacy Commissioner</li>
               </ul>
               <p className="font-semibold text-foreground">Contact</p>
-              <p className="text-xs">RemedyPills Pharmacy, Unit # 135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9</p>
+              <p className="text-xs">Remedy Pills Pharmacy, Unit # 135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9</p>
             </div>
           </ScrollArea>
           <Button className="w-full rounded-2xl" onClick={() => setShowPrivacy(false)}>Close</Button>
@@ -3042,9 +3042,9 @@ function PrivacyTermsDialogs({
           <DialogHeader><DialogTitle>Terms of Use</DialogTitle></DialogHeader>
           <ScrollArea className="max-h-[60vh]">
             <div className="space-y-4 pr-4 text-sm text-muted-foreground">
-              <p className="font-semibold text-foreground">RemedyPills Pharmacy — Terms of Use</p>
+              <p className="font-semibold text-foreground">Remedy Pills Pharmacy — Terms of Use</p>
               <p><strong>Effective Date:</strong> February 2026</p>
-              <p>By using the RemedyPills Patient Portal, you agree to these Terms of Use and our Privacy Policy.</p>
+              <p>By using the Remedy Pills Patient Portal, you agree to these Terms of Use and our Privacy Policy.</p>
               <p className="font-semibold text-foreground">Services</p>
               <p className="text-xs">The portal allows you to manage prescriptions, book pharmacy services, communicate with pharmacists, and track health metrics electronically.</p>
               <p className="font-semibold text-foreground">Not Medical Advice</p>
@@ -3058,7 +3058,7 @@ function PrivacyTermsDialogs({
               <p className="font-semibold text-foreground">Governing Law</p>
               <p className="text-xs">These Terms are governed by the laws of the Province of Alberta and the federal laws of Canada.</p>
               <p className="font-semibold text-foreground">Contact</p>
-              <p className="text-xs">RemedyPills Pharmacy, Unit # 135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9</p>
+              <p className="text-xs">Remedy Pills Pharmacy, Unit # 135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9</p>
             </div>
           </ScrollArea>
           <Button className="w-full rounded-2xl" onClick={() => setShowTerms(false)}>Close</Button>

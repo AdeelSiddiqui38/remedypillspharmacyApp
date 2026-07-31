@@ -1,7 +1,7 @@
 import nodemailer from "nodemailer";
 
 const PHARMACY_EMAIL = "remedypillspharmacy@gmail.com";
-const PHARMACY_NAME = "RemedyPills Pharmacy";
+const PHARMACY_NAME = "Remedy Pills Pharmacy";
 const PHARMACY_ADDRESS = "Unit # 135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9";
 
 function getTransporter() {
@@ -81,7 +81,7 @@ function generateICS(data: {
   const lines = [
     "BEGIN:VCALENDAR",
     "VERSION:2.0",
-    "PRODID:-//RemedyPills Pharmacy//Patient Portal//EN",
+    "PRODID:-//Remedy Pills Pharmacy//Patient Portal//EN",
     `METHOD:${data.method}`,
     "CALSCALE:GREGORIAN",
     "BEGIN:VEVENT",
@@ -359,7 +359,7 @@ export async function sendAppointmentCancellation(data: {
       await transporter.sendMail({
         from: `"${PHARMACY_NAME}" <${PHARMACY_EMAIL}>`,
         to: data.patientEmail,
-        subject: "Appointment Update — RemedyPills Pharmacy",
+        subject: "Appointment Update — Remedy Pills Pharmacy",
         html: patientHtml,
         icalEvent: {
           method: "CANCEL",
@@ -395,7 +395,7 @@ export async function sendTransferEmail(data: {
     <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
       <div style="background: #1a6b6d; color: white; padding: 20px; border-radius: 12px 12px 0 0;">
         <h2 style="margin: 0;">📋 New Prescription Transfer Request</h2>
-        <p style="margin: 4px 0 0; opacity: 0.9; font-size: 14px;">Submitted via RemedyPills Patient Portal</p>
+        <p style="margin: 4px 0 0; opacity: 0.9; font-size: 14px;">Submitted via Remedy Pills Patient Portal</p>
       </div>
       
       <div style="border: 1px solid #e5e7eb; border-top: none; padding: 20px; border-radius: 0 0 12px 12px;">

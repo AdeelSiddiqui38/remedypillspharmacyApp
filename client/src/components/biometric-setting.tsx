@@ -72,7 +72,7 @@ export function BiometricSetting() {
               Require {label} to open the app
             </p>
             <p className="text-xs text-muted-foreground">
-              Adds a lock screen each time you open RemedyPills, protecting your
+              Adds a lock screen each time you open Remedy Pills, protecting your
               health information on this device.
             </p>
           </div>

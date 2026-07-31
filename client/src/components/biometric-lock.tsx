@@ -46,7 +46,7 @@ export function BiometricLock({ children }: { children: ReactNode }) {
   const unlock = useCallback(async () => {
     setAuthing(true);
     setFailed(false);
-    const ok = await authenticateBiometric("Unlock RemedyPills Pharmacy");
+    const ok = await authenticateBiometric("Unlock Remedy Pills Pharmacy");
     setAuthing(false);
     if (ok) setLocked(false);
     else setFailed(true);
@@ -67,7 +67,7 @@ export function BiometricLock({ children }: { children: ReactNode }) {
         <Lock className="h-9 w-9" />
       </div>
       <div className="space-y-1">
-        <h1 className="text-xl font-semibold text-foreground">RemedyPills Pharmacy</h1>
+        <h1 className="text-xl font-semibold text-foreground">Remedy Pills Pharmacy</h1>
         <p className="text-sm text-muted-foreground">
           {failed ? "Authentication needed to continue." : "Verifying your identity…"}
         </p>

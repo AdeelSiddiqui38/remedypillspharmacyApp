@@ -1,16 +1,16 @@
-# Google Play Store Listing — RemedyPills Pharmacy
+# Google Play Store Listing — Remedy Pills Pharmacy
 
 ## App details
 
 **App name (max 30 chars):**
-RemedyPills Pharmacy
+Remedy Pills Pharmacy
 
 **Short description (max 80 chars):**
 Refills, reminders, bookings & pharmacist chat from your Calgary pharmacy.
 
 **Full description (max 4000 chars):**
 
-RemedyPills Pharmacy puts your Calgary pharmacy in your pocket. Manage prescriptions, stay on top of your medications, and reach a licensed pharmacist — all from one secure app.
+Remedy Pills Pharmacy puts your Calgary pharmacy in your pocket. Manage prescriptions, stay on top of your medications, and reach a licensed pharmacist — all from one secure app.
 
 REFILLS MADE SIMPLE
 Request prescription refills in seconds and track their status. No phone calls, no waiting on hold.
@@ -27,7 +27,7 @@ Ask questions securely and get answers from the pharmacy team you already know a
 TRANSFER YOUR PRESCRIPTIONS
 Moving from another pharmacy? Start a transfer right from the app.
 
-WHY REMEDYPILLS
+WHY REMEDY PILLS
 • Local, independent pharmacy in Nolan Hill, Calgary
 • Licensed under the Alberta College of Pharmacy
 • Prescribing pharmacists on staff
@@ -52,7 +52,7 @@ Dun & Bradstreet record exactly. This is **not** the app name.
 - D-U-N-S Number: **24-337-1905** (`243371905`)
 - Registered address: Unit #135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9
 
-> App/trade name shown to patients is **RemedyPills Pharmacy**. The store
+> App/trade name shown to patients is **Remedy Pills Pharmacy**. The store
 > "developer/seller" name defaults to the legal entity above unless a DBA is
 > registered with the store.
 

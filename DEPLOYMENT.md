@@ -1,4 +1,4 @@
-# RemedyPillsPharmacy — Deployment & Local Development
+# Remedy PillsPharmacy — Deployment & Local Development
 
 This project is a full-stack TypeScript app:
 - **Backend:** Express (Node)

@@ -1,4 +1,4 @@
-# RemedyPills Pharmacy App — Audit & Upgrade Report
+# Remedy Pills Pharmacy App — Audit & Upgrade Report
 
 **Repo reviewed:** github.com/AdeelSiddiqui38/remedypillspharmacyApp
 **Date:** July 6, 2026

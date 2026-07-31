@@ -13,7 +13,7 @@ const devUrl = 'http://10.0.2.2:3000'; // 10.0.2.2 = Android emulator's alias fo
 
 const config: CapacitorConfig = {
   appId: 'ca.remedypills.app',
-  appName: 'RemedyPills Pharmacy',
+  appName: 'Remedy Pills Pharmacy',
   webDir: 'dist/public',
   server: isProduction
     ? { url: productionUrl }

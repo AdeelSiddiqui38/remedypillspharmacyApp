@@ -115,7 +115,7 @@ export default function AuthPage() {
           <div className="mx-auto w-full max-w-md space-y-8">
             <div className="flex flex-col items-center space-y-4">
               <div className="grid h-20 w-20 place-items-center overflow-hidden rounded-2xl bg-white shadow-xl">
-                <img src={remedyLogo} alt="RemedyPills" className="h-full w-full object-contain p-1" />
+                <img src={remedyLogo} alt="Remedy Pills" className="h-full w-full object-contain p-1" />
               </div>
               <div className="space-y-2 text-center">
                 <h1 className="text-3xl font-bold leading-tight text-white sm:text-4xl" data-testid="text-hero-title">
@@ -182,7 +182,7 @@ export default function AuthPage() {
           <div className="mx-auto w-full max-w-md space-y-8">
             <div className="flex flex-col items-center space-y-3">
               <div className="grid h-16 w-16 place-items-center overflow-hidden rounded-2xl bg-white shadow-lg">
-                <img src={remedyLogo} alt="RemedyPills" className="h-full w-full object-contain p-1" />
+                <img src={remedyLogo} alt="Remedy Pills" className="h-full w-full object-contain p-1" />
               </div>
               <h2 className="text-xl font-bold text-white" data-testid="text-login-title">Welcome back</h2>
               <p className="text-sm text-white/50">Sign in to your patient portal</p>
@@ -289,10 +289,10 @@ export default function AuthPage() {
         <div className="mx-auto w-full max-w-md space-y-6">
           <div className="flex flex-col items-center space-y-2">
             <div className="grid h-14 w-14 place-items-center overflow-hidden rounded-2xl bg-white shadow-lg">
-              <img src={remedyLogo} alt="RemedyPills" className="h-full w-full object-contain p-1" />
+              <img src={remedyLogo} alt="Remedy Pills" className="h-full w-full object-contain p-1" />
             </div>
             <h2 className="text-xl font-bold text-white" data-testid="text-register-title">Create your profile</h2>
-            <p className="text-sm text-white/50">Set up your RemedyPills account</p>
+            <p className="text-sm text-white/50">Set up your Remedy Pills account</p>
           </div>
 
           <div className="space-y-3">
@@ -395,7 +395,7 @@ export default function AuthPage() {
                   data-testid="input-consent"
                 />
                 <span className="text-xs text-white/50 leading-relaxed">
-                  I consent to RemedyPills Pharmacy storing my health information and managing my prescriptions electronically. I agree to the{" "}
+                  I consent to Remedy Pills Pharmacy storing my health information and managing my prescriptions electronically. I agree to the{" "}
                   <button type="button" className="font-semibold text-primary underline" onClick={() => setShowPrivacy(true)} data-testid="link-privacy-policy">Privacy Policy</button>{" "}and{" "}
                   <button type="button" className="font-semibold text-primary underline" onClick={() => setShowTerms(true)} data-testid="link-terms">Terms of Use</button>.
                 </span>
@@ -477,9 +477,9 @@ function PrivacyTermsModals({
 function PrivacyPolicyContent() {
   return (
     <div className="space-y-4 pr-4 text-sm text-muted-foreground">
-      <p className="font-semibold text-foreground">RemedyPills Pharmacy — Privacy Policy</p>
+      <p className="font-semibold text-foreground">Remedy Pills Pharmacy — Privacy Policy</p>
       <p><strong>Effective Date:</strong> February 2026</p>
-      <p>RemedyPills Pharmacy ("we", "us", "our") is committed to protecting your personal health information in compliance with Alberta's <strong>Health Information Act (HIA)</strong> and Canada's <strong>Personal Information Protection and Electronic Documents Act (PIPEDA)</strong>.</p>
+      <p>Remedy Pills Pharmacy ("we", "us", "our") is committed to protecting your personal health information in compliance with Alberta's <strong>Health Information Act (HIA)</strong> and Canada's <strong>Personal Information Protection and Electronic Documents Act (PIPEDA)</strong>.</p>
 
       <p className="font-semibold text-foreground">1. Information We Collect</p>
       <p>We collect the following information through our Patient Portal:</p>
@@ -525,7 +525,7 @@ function PrivacyPolicyContent() {
       <p>Prescription records are retained as required by the Alberta Pharmacy and Drug Act (minimum 2 years). Other health information is retained in accordance with HIA requirements.</p>
 
       <p className="font-semibold text-foreground">7. Contact Us</p>
-      <p>RemedyPills Pharmacy<br/>Unit # 135, 246 Nolanridge Crescent NW<br/>Calgary, AB T3R 1W9<br/>Phone: +1 (403) 980-7003 &middot; Fax: +1 (403) 518-7522<br/>Email: remedypillspharmacy@gmail.com</p>
+      <p>Remedy Pills Pharmacy<br/>Unit # 135, 246 Nolanridge Crescent NW<br/>Calgary, AB T3R 1W9<br/>Phone: +1 (403) 980-7003 &middot; Fax: +1 (403) 518-7522<br/>Email: remedypillspharmacy@gmail.com</p>
     </div>
   );
 }
@@ -533,11 +533,11 @@ function PrivacyPolicyContent() {
 function TermsOfUseContent() {
   return (
     <div className="space-y-4 pr-4 text-sm text-muted-foreground">
-      <p className="font-semibold text-foreground">RemedyPills Pharmacy — Terms of Use</p>
+      <p className="font-semibold text-foreground">Remedy Pills Pharmacy — Terms of Use</p>
       <p><strong>Effective Date:</strong> February 2026</p>
 
       <p className="font-semibold text-foreground">1. Acceptance</p>
-      <p>By creating an account or using the RemedyPills Patient Portal, you agree to these Terms of Use and our Privacy Policy.</p>
+      <p>By creating an account or using the Remedy Pills Patient Portal, you agree to these Terms of Use and our Privacy Policy.</p>
 
       <p className="font-semibold text-foreground">2. Patient Portal Services</p>
       <p>The Patient Portal allows you to:</p>
@@ -568,13 +568,13 @@ function TermsOfUseContent() {
       <p>You agree not to misuse the portal, submit false information, attempt unauthorized access, or interfere with the platform's security features.</p>
 
       <p className="font-semibold text-foreground">7. Limitation of Liability</p>
-      <p>RemedyPills Pharmacy is not liable for delays, interruptions, or errors in the Patient Portal. Prescription availability and pharmacy services are subject to applicable laws and regulations.</p>
+      <p>Remedy Pills Pharmacy is not liable for delays, interruptions, or errors in the Patient Portal. Prescription availability and pharmacy services are subject to applicable laws and regulations.</p>
 
       <p className="font-semibold text-foreground">8. Governing Law</p>
       <p>These Terms are governed by the laws of the Province of Alberta and the federal laws of Canada applicable therein.</p>
 
       <p className="font-semibold text-foreground">9. Contact Us</p>
-      <p>RemedyPills Pharmacy<br/>Unit # 135, 246 Nolanridge Crescent NW<br/>Calgary, AB T3R 1W9<br/>Phone: +1 (403) 980-7003 &middot; Fax: +1 (403) 518-7522<br/>Email: remedypillspharmacy@gmail.com</p>
+      <p>Remedy Pills Pharmacy<br/>Unit # 135, 246 Nolanridge Crescent NW<br/>Calgary, AB T3R 1W9<br/>Phone: +1 (403) 980-7003 &middot; Fax: +1 (403) 518-7522<br/>Email: remedypillspharmacy@gmail.com</p>
     </div>
   );
 }

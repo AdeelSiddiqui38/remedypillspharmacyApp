@@ -37,7 +37,7 @@ export function ReminderNotificationsToggle({ reminders }: { reminders: Reminder
         toast({
           title: "Notifications not enabled",
           description:
-            "Allow notifications for RemedyPills in your device Settings to get medication reminders.",
+            "Allow notifications for Remedy Pills in your device Settings to get medication reminders.",
           variant: "destructive",
         });
       }
