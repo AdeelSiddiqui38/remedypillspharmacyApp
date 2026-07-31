@@ -17,6 +17,7 @@ Companion to `MACSTORE_DEPLOYMENT.md` (which explains the *why*); this file is t
 | 3 | Native build prep (code, Info.plist) | **Claude — done** | ☑ |
 | 4 | `npm install && npx cap sync ios` | You (your Mac) | ☐ |
 | 5 | Xcode signing + Archive + Upload | You (your Mac) | ☐ |
+| 5b | Seed reviewer demo account (`npm run seed:reviewer`) | You (one command) | ☐ |
 | 6 | Create app record + paste metadata below | You, with Claude guiding live | ☐ |
 | 7 | Screenshots | You capture, Claude advises | ☐ |
 | 8 | Enable Mac availability | You (one toggle) | ☐ |
@@ -159,7 +160,21 @@ Calgary, AB T3R 1W9.
 ```
 
 **Sign-in required:** Yes.
-**Demo account:** create a dedicated patient login before submitting (suggested username `appstore-review`), seed it with a couple of fake prescriptions and reminders, and put the username/password in the review fields. **Do not** use a real patient account.
+
+**Demo account — seeded by script.** Run this once against production before submitting:
+
+```bash
+cd ~/Documents/Claude/Projects/RemedyPillsPharmacy_App/app
+REVIEWER_BOOTSTRAP_PASSWORD='<a strong unique password>' npm run seed:reviewer
+```
+
+Creates username **`appstore-review`** with entirely synthetic data — 3 prescriptions (one marked ready for pickup), 4 daily medication reminders, 2 appointments, 4 health logs, and a short pharmacy message thread. No real patient information.
+
+- Put `appstore-review` + that password into the App Store Connect review fields (and Play Console — the same account works for both).
+- The reminder times are real (`08:00 AM`, `09:00 AM`, `06:00 PM`, `10:00 PM`), so the reviewer's notification test in the notes below will genuinely fire.
+- Safe to re-run: it does nothing if the account exists. Add `--reset` (`npm run seed:reviewer -- --reset`) to rebuild the demo content.
+- ⚠️ This is a **real login on your production database**. Use a strong, unique password you don't use elsewhere, store it in your password manager, and consider disabling the account once the app is approved.
+- **Do not** use a real patient account.
 
 **Contact:** Adeel Siddiqui · +1 403-980-7003 · info@remedypills.ca — Apple uses this if they have questions during review, so make sure it's monitored while the app is in review.
 
