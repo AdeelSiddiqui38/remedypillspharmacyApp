@@ -29,7 +29,16 @@ You don't have an account yet, and enrollment is the long pole — start it befo
 
 1. Go to `developer.apple.com/programs/enroll`. Cost is **US $99/year** (same for individuals and organizations).
 2. **Enroll as an organization** using your pharmacy's legal entity, not a personal account. A health app under a real business name reviews more smoothly, and org accounts let you manage roles later.
-3. Organization enrollment requires a **D-U-N-S number** — a free nine-digit business identifier from Dun & Bradstreet. Check/request one at Apple's D-U-N-S lookup. Getting the number takes **1–5 business days**; total org enrollment commonly takes **1–2 weeks**. You also need legal authority to bind the organization to Apple's agreement.
+3. Organization enrollment requires a **D-U-N-S number** — a free nine-digit business identifier from Dun & Bradstreet. ✅ **Already obtained:**
+
+   | Field | Value |
+   |---|---|
+   | Legal entity name | **Remedy Pills Inc** |
+   | D-U-N-S Number | **24-337-1905** (`243371905`) |
+
+   ⚠️ **Enter the legal entity name exactly as `Remedy Pills Inc`** during enrollment — Apple matches it character-for-character against the Dun & Bradstreet record. Do **not** enter "RemedyPills Pharmacy" (the trade/app name) in the legal entity field; a mismatch is the most common cause of enrollment rejection and restarts the review. The address and phone you give Apple must also match the D&B record.
+
+   You also need legal authority to bind the organization to Apple's agreement. Total org enrollment commonly takes **1–2 weeks**.
 4. Once enrolled, sign the latest **Paid Apps Agreement** in App Store Connect → Business. **This matters for the Mac step:** Apple only auto-distributes your iOS apps to Apple Silicon Macs after this agreement is signed.
 
 While you wait for enrollment, do Stages 3–4 up to the point of needing a signing team.

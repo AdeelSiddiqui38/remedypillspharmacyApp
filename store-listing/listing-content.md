@@ -43,6 +43,19 @@ This app is intended for patients of Remedy Pills Pharmacy in Calgary, Alberta.
 - Category: Medical
 - Tags: pharmacy, prescription, medication
 
+## Developer / legal entity
+
+Used for Play Console and Apple Developer account registration — must match the
+Dun & Bradstreet record exactly. This is **not** the app name.
+
+- Legal entity: **Remedy Pills Inc**
+- D-U-N-S Number: **24-337-1905** (`243371905`)
+- Registered address: Unit #135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9
+
+> App/trade name shown to patients is **RemedyPills Pharmacy**. The store
+> "developer/seller" name defaults to the legal entity above unless a DBA is
+> registered with the store.
+
 ## Contact details
 
 - Email: info@remedypills.ca (or remedypillspharmacy@gmail.com)

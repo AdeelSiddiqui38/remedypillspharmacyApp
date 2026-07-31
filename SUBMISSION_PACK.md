@@ -11,6 +11,7 @@ Companion to `MACSTORE_DEPLOYMENT.md` (which explains the *why*); this file is t
 
 | # | Step | Who | Status |
 |---|---|---|---|
+| 0 | D-U-N-S number for Remedy Pills Inc | You | ☑ `24-337-1905` |
 | 1 | Apple Developer Program enrollment | **You** (payment + identity) | ☐ |
 | 2 | Sign Paid Apps Agreement | **You** (legal) | ☐ |
 | 3 | Native build prep (code, Info.plist) | **Claude — done** | ☑ |
@@ -22,6 +23,30 @@ Companion to `MACSTORE_DEPLOYMENT.md` (which explains the *why*); this file is t
 | 9 | Submit for Review | **You** (legal declaration) | ☐ |
 
 ---
+
+## 0b. Company / enrollment details
+
+Use these exact values when enrolling in the Apple Developer Program.
+
+| Field | Value |
+|---|---|
+| **Legal entity name** | **Remedy Pills Inc** |
+| **D-U-N-S Number** | **24-337-1905** (enter as `243371905` if hyphens are rejected) |
+| Business address | Unit #135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9, Canada |
+| Business phone | +1 403-980-7003 |
+| Business email | info@remedypills.ca |
+| Website | https://remedypills.ca |
+| Entity type | Corporation (Canada) |
+| Program cost | US $99/year |
+
+⚠️ **Two names, don't mix them up:**
+
+- **`Remedy Pills Inc`** — the *legal entity*. Use this for enrollment, the D-U-N-S record, tax/banking forms, and the Apple Developer account name. Apple matches it character-for-character against Dun & Bradstreet; a mismatch (e.g. "RemedyPills Pharmacy", "Remedy Pills Inc.", "Remedy Pills Incorporated") gets the application bounced and you start over.
+- **`RemedyPills Pharmacy`** — the *app name / trade name*. Use this for the App Store listing only.
+
+Your App Store **seller name** defaults to the legal entity (`Remedy Pills Inc`). If you'd rather patients see "RemedyPills Pharmacy" on the listing, request a **DBA / trade name** in App Store Connect → Business after enrollment; Apple requires supporting documentation for the alternate name.
+
+Also confirm the address and phone number you give Apple match the D&B record exactly — Apple often verifies by calling the number on file, so make sure it's answered.
 
 ## 1. App information
 
@@ -127,7 +152,7 @@ Calgary, AB T3R 1W9.
 **Sign-in required:** Yes.
 **Demo account:** create a dedicated patient login before submitting (suggested username `appstore-review`), seed it with a couple of fake prescriptions and reminders, and put the username/password in the review fields. **Do not** use a real patient account.
 
-**Contact:** your name, pharmacy phone, and an email you monitor — Apple uses it if they have questions.
+**Contact:** Adeel Siddiqui · +1 403-980-7003 · info@remedypills.ca — Apple uses this if they have questions during review, so make sure it's monitored while the app is in review.
 
 ## 4. App Privacy (nutrition label)
 

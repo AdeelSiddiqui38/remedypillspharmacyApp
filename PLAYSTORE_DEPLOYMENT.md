@@ -19,7 +19,15 @@ If you deploy under a different domain than `app.remedypills.ca`, update `produc
 ## Stage 2 — Google Play Developer account
 
 1. Go to `play.google.com/console/signup` and register. One-time US$25 fee.
-2. Register as an **organization** if you can (using your pharmacy business details) rather than a personal account — organization accounts skip the "12 testers for 14 days" closed-testing requirement that personal accounts created after Nov 2023 must satisfy, and look more trustworthy for a health app. You'll need a D-U-N-S number for organization registration (free from Dun & Bradstreet; allow ~a week).
+2. Register as an **organization** if you can rather than a personal account — organization accounts skip the "12 testers for 14 days" closed-testing requirement that personal accounts created after Nov 2023 must satisfy, and look more trustworthy for a health app. Organization registration needs a D-U-N-S number, which you already have:
+
+   | Field | Value |
+   |---|---|
+   | Legal entity name | **Remedy Pills Inc** |
+   | D-U-N-S Number | **24-337-1905** (`243371905`) |
+   | Business address | Unit #135, 246 Nolanridge Crescent NW, Calgary, AB T3R 1W9 |
+
+   Enter the legal entity as **`Remedy Pills Inc`** — it must match the Dun & Bradstreet record exactly. "RemedyPills Pharmacy" is the app/trade name and belongs in the store listing, not the legal entity field. The same D-U-N-S number works for both Google Play and Apple.
 3. Complete identity verification. This can take a few days — start it early and do Stage 1 while you wait.
 
 ## Stage 3 — Build, sign, and submit
