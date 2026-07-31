@@ -4,6 +4,8 @@ import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast, toast } from "@/hooks/use-toast";
 import BiometricSetting from "@/components/biometric-setting";
+import ReminderNotificationsToggle from "@/components/reminder-notifications-toggle";
+import { syncReminderNotifications } from "@/lib/reminder-notifications";
 import { Redirect } from "wouter";
 import { QRCodeSVG } from "qrcode.react";
 import {
@@ -599,6 +601,12 @@ export default function PharmacyApp() {
   const needsReminders = activeTab === "home" || activeTab === "reminders";
   const { data: prescriptions = [] } = useQuery<Prescription[]>({ queryKey: ["/api/prescriptions"], enabled: needsRx, staleTime: 30_000 });
   const { data: reminders = [] } = useQuery<Reminder[]>({ queryKey: ["/api/reminders"], enabled: needsReminders, staleTime: 30_000 });
+
+  // Keep native medication-reminder notifications in sync with the reminder
+  // list. No-op on the web or when the user hasn't enabled notifications.
+  useEffect(() => {
+    void syncReminderNotifications(reminders);
+  }, [reminders]);
   const { data: appointments = [] } = useQuery<Appointment[]>({ queryKey: ["/api/appointments"], enabled: activeTab === "home" || activeTab === "appointments", staleTime: 30_000 });
   const { data: messages = [] } = useQuery<Message[]>({ queryKey: ["/api/messages"], enabled: showChatModal, staleTime: 10_000 });
   const { data: appNotifications = [] } = useQuery<AppNotification[]>({ queryKey: ["/api/notifications"], staleTime: 30_000 });
@@ -1484,6 +1492,8 @@ function RemindersTab({
           <p className="mt-1 text-2xl font-bold text-emerald-600">{reminders.filter(r => r.taken).length}</p>
         </Card>
       </div>
+
+      <ReminderNotificationsToggle reminders={reminders} />
 
       <Card className="rounded-2xl border-0 bg-white shadow-sm">
         <CardHeader className="flex flex-row items-center justify-between">
