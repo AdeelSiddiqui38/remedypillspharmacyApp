@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowLeft, ChevronRight } from "lucide-react";
+import { isSocialLoginAvailable } from "@/lib/social-auth";
 import remedyLogo from "@assets/Remedypills_logo_1_1771941028931.png";
 import heroImage from "@assets/WhatsApp_Image_2026-02-24_at_23.04.48_1772000003452.jpeg";
 
@@ -36,6 +37,7 @@ export default function AuthPage() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [oauthError, setOauthError] = useState<string | null>(null);
+  const socialLogin = isSocialLoginAvailable();
 
   // Check for OAuth errors in URL query params
   useEffect(() => {
@@ -188,30 +190,35 @@ export default function AuthPage() {
               <p className="text-sm text-white/50">Sign in to your patient portal</p>
             </div>
 
-            <div className="space-y-3">
-              {oauthError && (
-                <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3">
-                  <p className="text-xs text-red-400">{oauthError}</p>
-                </div>
-              )}
-              <button
-                type="button"
-                className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 text-sm font-medium text-white transition hover:bg-white/10"
-                onClick={() => handleSocialLogin("google")}
-                data-testid="button-google-login"
-                disabled={providers ? !providers.google : false}
-                title={providers && !providers.google ? "Google sign-in not configured" : undefined}
-              >
-                <GoogleIcon />
-                Continue with Google
-              </button>
-            </div>
+            {oauthError && (
+              <div className="rounded-xl border border-red-500/30 bg-red-500/10 p-3">
+                <p className="text-xs text-red-400">{oauthError}</p>
+              </div>
+            )}
 
-            <div className="flex items-center gap-4">
-              <div className="h-px flex-1 bg-white/10" />
-              <span className="text-xs text-white/30">or sign in with username</span>
-              <div className="h-px flex-1 bg-white/10" />
-            </div>
+            {socialLogin && (
+              <>
+                <div className="space-y-3">
+                  <button
+                    type="button"
+                    className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 text-sm font-medium text-white transition hover:bg-white/10"
+                    onClick={() => handleSocialLogin("google")}
+                    data-testid="button-google-login"
+                    disabled={providers ? !providers.google : false}
+                    title={providers && !providers.google ? "Google sign-in not configured" : undefined}
+                  >
+                    <GoogleIcon />
+                    Continue with Google
+                  </button>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <div className="h-px flex-1 bg-white/10" />
+                  <span className="text-xs text-white/30">or sign in with username</span>
+                  <div className="h-px flex-1 bg-white/10" />
+                </div>
+              </>
+            )}
 
             <form onSubmit={handleLogin} className="space-y-4">
               <div className="space-y-2">
@@ -295,25 +302,29 @@ export default function AuthPage() {
             <p className="text-sm text-white/50">Set up your Remedy Pills account</p>
           </div>
 
-          <div className="space-y-3">
-            <button
-              type="button"
-              className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 text-sm font-medium text-white transition hover:bg-white/10"
-              onClick={() => handleSocialLogin("google")}
-              data-testid="button-google-register"
-              disabled={providers ? !providers.google : false}
-              title={providers && !providers.google ? "Google sign-in not configured" : undefined}
-            >
-              <GoogleIcon />
-              Sign up with Google
-            </button>
-          </div>
+          {socialLogin && (
+            <>
+              <div className="space-y-3">
+                <button
+                  type="button"
+                  className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 text-sm font-medium text-white transition hover:bg-white/10"
+                  onClick={() => handleSocialLogin("google")}
+                  data-testid="button-google-register"
+                  disabled={providers ? !providers.google : false}
+                  title={providers && !providers.google ? "Google sign-in not configured" : undefined}
+                >
+                  <GoogleIcon />
+                  Sign up with Google
+                </button>
+              </div>
 
-          <div className="flex items-center gap-4">
-            <div className="h-px flex-1 bg-white/10" />
-            <span className="text-xs text-white/30">or create with username</span>
-            <div className="h-px flex-1 bg-white/10" />
-          </div>
+              <div className="flex items-center gap-4">
+                <div className="h-px flex-1 bg-white/10" />
+                <span className="text-xs text-white/30">or create with username</span>
+                <div className="h-px flex-1 bg-white/10" />
+              </div>
+            </>
+          )}
 
           <form onSubmit={handleRegister} className="space-y-3">
             <div className="space-y-1.5">
