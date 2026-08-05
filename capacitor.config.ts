@@ -5,10 +5,12 @@ import type { CapacitorConfig } from '@capacitor/cli';
 // backend (sessions, prescriptions, etc.) has to be a real server either way.
 //
 // Build with CAPACITOR_ENV=production to point at the real deployed app
-// instead of the local dev server. Update productionUrl once the DO App
-// Platform custom domain is live (currently assumed to be app.remedypills.ca).
+// instead of the local dev server. This must be a URL that actually resolves —
+// pointing it at a domain whose DNS hasn't propagated yet ships an app that
+// opens to a blank error page (Play Store rejects that as broken functionality).
+// Switch to https://app.remedypills.ca once that domain is live and verified.
 const isProduction = process.env.CAPACITOR_ENV === 'production';
-const productionUrl = 'https://app.remedypills.ca';
+const productionUrl = 'https://remedypillspharmacyapp-production.up.railway.app';
 const devUrl = 'http://10.0.2.2:3000'; // 10.0.2.2 = Android emulator's alias for the host machine's loopback
 
 const config: CapacitorConfig = {
