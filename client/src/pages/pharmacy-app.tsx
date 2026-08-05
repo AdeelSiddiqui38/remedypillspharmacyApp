@@ -2621,7 +2621,27 @@ function AccountTab({
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [showWithdrawConsent, setShowWithdrawConsent] = useState(false);
+  const [showDeleteAccount, setShowDeleteAccount] = useState(false);
+  const [deletePassword, setDeletePassword] = useState("");
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteResult, setDeleteResult] = useState<{ purged: boolean; retainedUntil: string | null } | null>(null);
   const queryClient = useQueryClient();
+
+  // The account row survives when pharmacy records must be retained, so the
+  // server reports what actually happened and we show that instead of
+  // claiming everything was erased.
+  const deleteAccountMutation = useMutation({
+    mutationFn: async () => {
+      const res = await apiRequest("DELETE", "/api/account", { password: deletePassword });
+      return (await res.json()) as { purged: boolean; retainedUntil: string | null };
+    },
+    onSuccess: (result) => {
+      setDeleteError(null);
+      setDeletePassword("");
+      setDeleteResult(result);
+    },
+    onError: (err: any) => setDeleteError(err?.message || "Could not delete your account. Please try again."),
+  });
 
   const withdrawConsentMutation = useMutation({
     mutationFn: () => apiRequest("POST", "/api/consent/withdraw"),
@@ -2756,6 +2776,99 @@ function AccountTab({
       </Card>
 
       <ShareAppCard />
+
+      <Card className="rounded-2xl border-0 bg-white shadow-sm">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2 text-base"><Trash2 className="h-4 w-4 text-destructive" /> Delete Account</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-muted-foreground">
+            Permanently close your account and sign out on all devices. Prescription and
+            appointment records are kept for as long as Alberta pharmacy law requires, then
+            deleted automatically.
+          </p>
+          <Button
+            variant="outline"
+            className="w-full rounded-2xl border-destructive/30 text-destructive hover:bg-destructive/10"
+            onClick={() => { setDeleteError(null); setShowDeleteAccount(true); }}
+            data-testid="button-open-delete-account"
+          >
+            Delete my account
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Dialog
+        open={showDeleteAccount}
+        onOpenChange={(open) => {
+          // Once it's done the account is gone — closing reloads to the login screen.
+          if (!open && deleteResult) { window.location.href = "/auth"; return; }
+          if (!open) { setDeletePassword(""); setDeleteError(null); }
+          setShowDeleteAccount(open);
+        }}
+      >
+        <DialogContent className="max-w-sm rounded-3xl">
+          <DialogHeader><DialogTitle>{deleteResult ? "Account Deleted" : "Delete Account"}</DialogTitle></DialogHeader>
+
+          {deleteResult ? (
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                {deleteResult.purged
+                  ? "Your account and all associated data have been permanently deleted."
+                  : "Your account has been closed and you can no longer sign in. Your reminders, health logs and notifications have been deleted."}
+              </p>
+              {!deleteResult.purged && deleteResult.retainedUntil && (
+                <p className="text-xs text-muted-foreground">
+                  Alberta College of Pharmacy rules require us to keep your prescription and
+                  appointment records until <strong>{deleteResult.retainedUntil}</strong>. They are
+                  deleted automatically after that date and are not used for any other purpose.
+                </p>
+              )}
+              <Button className="w-full rounded-2xl" onClick={() => { window.location.href = "/auth"; }} data-testid="button-delete-done">
+                Done
+              </Button>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              <p className="text-sm text-muted-foreground">
+                This closes your account and signs you out everywhere. Your reminders, health logs
+                and notifications are deleted immediately.
+              </p>
+              <p className="text-xs text-muted-foreground">
+                Prescription and appointment records must be kept under Alberta College of Pharmacy
+                rules for 10 years after your last pharmacy service, and are deleted automatically
+                once that period ends. This cannot be undone.
+              </p>
+              {(user.provider === "local" || !user.provider) && (
+                <div className="space-y-1.5">
+                  <label className="text-xs font-medium text-muted-foreground">Confirm your password</label>
+                  <Input
+                    type="password"
+                    value={deletePassword}
+                    onChange={(e) => setDeletePassword(e.target.value)}
+                    placeholder="Your password"
+                    className="rounded-2xl"
+                    data-testid="input-delete-password"
+                  />
+                </div>
+              )}
+              {deleteError && <p className="text-xs text-destructive" data-testid="text-delete-error">{deleteError}</p>}
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex-1 rounded-2xl" onClick={() => setShowDeleteAccount(false)} data-testid="button-cancel-delete-account">Cancel</Button>
+                <Button
+                  variant="destructive"
+                  className="flex-1 rounded-2xl"
+                  onClick={() => deleteAccountMutation.mutate()}
+                  disabled={deleteAccountMutation.isPending || ((user.provider === "local" || !user.provider) && !deletePassword)}
+                  data-testid="button-confirm-delete-account"
+                >
+                  {deleteAccountMutation.isPending ? "Deleting..." : "Delete account"}
+                </Button>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
 
       <Dialog open={showWithdrawConsent} onOpenChange={setShowWithdrawConsent}>
         <DialogContent className="max-w-sm rounded-3xl">

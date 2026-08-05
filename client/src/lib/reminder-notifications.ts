@@ -133,7 +133,9 @@ export async function syncReminderNotifications(reminders: Reminder[]): Promise<
         // Repeats daily at the reminder's time, firing even when the app
         // is closed — handled by the OS, no server involvement.
         schedule: { on: { hour: at.hour, minute: at.minute }, allowWhileIdle: true },
-        smallIcon: "ic_stat_icon_config_sample",
+        // Must match a drawable in android/app/src/main/res/drawable. Capacitor
+        // silently falls back to a generic system icon when the name is wrong.
+        smallIcon: "ic_stat_reminder",
       }));
 
     if (toSchedule.length > 0) {

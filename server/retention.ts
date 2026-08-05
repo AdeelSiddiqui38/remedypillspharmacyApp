@@ -105,6 +105,71 @@ export async function runRetentionSweep(): Promise<{ checked: number; deleted: n
   return { checked: patients.length, deleted };
 }
 
+/**
+ * Handle a patient asking for their own account to be deleted.
+ *
+ * Google Play and the App Store both require an in-app deletion path, but a
+ * pharmacy cannot simply erase a patient on request: the ACP rule above still
+ * applies to prescriptions and appointments, and those records identify the
+ * patient, so the user row has to survive alongside them.
+ *
+ * So there are two outcomes:
+ *   • No pharmacy service on record  → nothing to retain, purge everything now.
+ *   • Has prescriptions/appointments → delete the data that isn't a pharmacy
+ *     record (reminders, notifications, health and calorie logs), block sign-in
+ *     by stamping `deletedAt`, and leave the clinical records for the sweep to
+ *     purge when the retention period lapses.
+ *
+ * Returns what happened so the UI can tell the patient the truth rather than a
+ * blanket "your data is gone".
+ */
+export async function deletePatientAccount(
+  userId: string,
+): Promise<{ purged: boolean; retainedUntil: string | null }> {
+  const lastService = await getLastServiceDate(userId);
+
+  if (!lastService) {
+    await purgeUser(userId, new Date());
+    return { purged: true, retainedUntil: null };
+  }
+
+  const user = await storage.getUser(userId);
+  const dob = parseDate(user?.dob);
+
+  // Non-clinical data has no retention obligation, so it goes immediately.
+  await Promise.all([
+    storage.deleteAllRemindersByUser(userId),
+    storage.deleteAllNotificationsByUser(userId),
+    storage.deleteAllHealthLogsByUser(userId),
+    storage.deleteAllCalorieLogsByUser(userId),
+  ]);
+
+  await storage.updateUser(userId, { deletedAt: new Date().toISOString() });
+
+  await storage.createAuditLog({
+    userId,
+    action: "account_deletion_requested",
+    details:
+      `Patient requested account deletion. Sign-in disabled and non-clinical data removed. ` +
+      `Pharmacy records retained under the ${RETENTION_YEARS}-year ACP rule ` +
+      `(last service ${lastService.toISOString().slice(0, 10)}).`,
+    ipAddress: "user",
+    timestamp: new Date().toISOString(),
+  });
+
+  const cutoff = new Date(lastService);
+  cutoff.setFullYear(cutoff.getFullYear() + RETENTION_YEARS);
+  if (dob && ageAt(dob, lastService) < 18) {
+    const minorCutoff = new Date(dob);
+    minorCutoff.setFullYear(minorCutoff.getFullYear() + MINOR_RETENTION_AGE);
+    if (minorCutoff > cutoff) {
+      return { purged: false, retainedUntil: minorCutoff.toISOString().slice(0, 10) };
+    }
+  }
+
+  return { purged: false, retainedUntil: cutoff.toISOString().slice(0, 10) };
+}
+
 export function startRetentionSweepSchedule() {
   runRetentionSweep().catch((err) => console.error("[retention] Initial sweep failed:", err));
   setInterval(() => {

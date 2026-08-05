@@ -19,6 +19,13 @@ export const users = pgTable("users", {
   lastLoginAt: text("last_login_at"),
   failedLoginAttempts: integer("failed_login_attempts").notNull().default(0),
   lockedUntil: text("locked_until"),
+  // Set when the patient asks for their account to be deleted. The row itself
+  // has to survive: Alberta College of Pharmacy rules require the prescription
+  // and appointment records hanging off it to be kept for 10 years past the
+  // last pharmacy service, and those records identify the patient. Login is
+  // refused from this moment on, and the retention sweep purges the row (and
+  // everything under it) once the hold lapses. See server/retention.ts.
+  deletedAt: text("deleted_at"),
 });
 
 export const insertUserSchema = createInsertSchema(users).omit({ id: true });

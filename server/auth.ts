@@ -6,6 +6,7 @@ import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
 import { storage } from "./storage";
+import { deletePatientAccount } from "./retention";
 import { authLimiter } from "./security";
 import { z } from "zod";
 import { User as SelectUser, insertUserSchema } from "@shared/schema";
@@ -144,6 +145,14 @@ export function setupAuth(app: Express) {
           return done(null, false, { message: "Invalid username or password" });
         }
 
+        // Deleted accounts keep their row so the retained pharmacy records
+        // stay attached to a patient, but they must never be able to sign in.
+        // Same generic message as a wrong password so the response doesn't
+        // confirm the account ever existed.
+        if (user.deletedAt) {
+          return done(null, false, { message: "Invalid username or password" });
+        }
+
         if (user.lockedUntil) {
           const lockExpiry = new Date(user.lockedUntil);
           if (lockExpiry > new Date()) {
@@ -214,6 +223,11 @@ export function setupAuth(app: Express) {
               name: profile.displayName,
               email: profile.emails?.[0]?.value,
             });
+            // A deleted account keeps its provider id, so signing in with the
+            // same Google account would otherwise revive it.
+            if (user.deletedAt) {
+              return done(null, false, { message: "Account has been deleted" });
+            }
             await storage.updateUserLoginTracking(user.id, {
               lastLoginAt: new Date().toISOString(),
             });
@@ -232,6 +246,8 @@ export function setupAuth(app: Express) {
     try {
       const user = await storage.getUser(id);
       if (!user) return done(null, false);
+      // Drops any session that was already open when the account was deleted.
+      if (user.deletedAt) return done(null, false);
       done(null, user);
     } catch (err) {
       done(err as Error);
@@ -341,6 +357,35 @@ export function setupAuth(app: Express) {
       timestamp: new Date().toISOString(),
     });
     res.json({ success: true });
+  });
+
+  // In-app account deletion. Required by both app stores for any app that
+  // lets users create an account. Admins are excluded so the last operator
+  // can't lock themselves out of the pharmacy console.
+  app.delete("/api/account", authLimiter, requireAuth, async (req, res) => {
+    const user = await storage.getUser(req.user!.id);
+    if (!user) return res.status(404).json({ message: "Account not found" });
+    if (user.role === "admin") {
+      return res.status(403).json({
+        message: "Staff accounts can't be deleted from the app. Contact the pharmacy manager.",
+      });
+    }
+
+    // Local accounts confirm with their password; Google accounts have none to
+    // check, and reaching this endpoint already required a valid session.
+    if (user.provider === "local" || !user.provider) {
+      const { password } = req.body ?? {};
+      if (typeof password !== "string" || !(await comparePasswords(password, user.password))) {
+        return res.status(401).json({ message: "Password is incorrect" });
+      }
+    }
+
+    const result = await deletePatientAccount(user.id);
+
+    req.logout((err) => {
+      if (err) return res.status(500).json({ message: "Failed to end session" });
+      req.session.destroy(() => res.json({ success: true, ...result }));
+    });
   });
 
   app.post("/api/consent", requireAuth, async (req, res) => {
