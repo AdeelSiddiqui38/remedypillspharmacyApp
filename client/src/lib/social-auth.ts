@@ -73,7 +73,13 @@ export async function signInWithGoogle(): Promise<boolean> {
     if ("idToken" in result) idToken = result.idToken;
   } catch (err: any) {
     if (err?.code === "USER_CANCELLED") return false;
-    throw new Error("Google sign-in was cancelled or failed.");
+    // Keep the underlying code and message. Google's native SDK reports real
+    // faults as numeric status codes — 10 is a signature/package mismatch
+    // against the Android OAuth client, 12501 is a genuine cancel, 7 is a
+    // network failure — and collapsing them into one string makes the
+    // difference between "misconfigured" and "no signal" impossible to see.
+    const detail = [err?.code, err?.message].filter(Boolean).join(": ");
+    throw new Error(detail ? `Google sign-in failed — ${detail}` : "Google sign-in failed.");
   }
 
   if (!idToken) {
