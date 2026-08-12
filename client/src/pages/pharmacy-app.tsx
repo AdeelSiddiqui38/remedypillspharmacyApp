@@ -2303,7 +2303,11 @@ function CalorieTracker() {
   );
 }
 
-const APP_SHARE_URL = typeof window !== "undefined" ? window.location.origin : "https://remedypills.replit.app";
+// Always the Play Store listing, not window.location.origin. Inside the
+// installed app that origin is the Railway URL the WebView loads — sharing it
+// would just open a browser tab for whoever receives it, not get them to
+// install the app. The whole point of this card is new installs.
+const APP_SHARE_URL = "https://play.google.com/store/apps/details?id=ca.remedypills.app";
 
 function ShareAppCard() {
   const [mode, setMode] = useState<"share" | "qr" | "nfc">("share");
@@ -2321,7 +2325,7 @@ function ShareAppCard() {
       try {
         await navigator.share({
           title: "Remedy Pills Pharmacy",
-          text: "Manage your prescriptions, book appointments, and track your health with Remedy Pills Pharmacy.",
+          text: "Manage your prescriptions, book appointments, and track your health with Remedy Pills Pharmacy. Download the app:",
           url: APP_SHARE_URL,
         });
       } catch {}
