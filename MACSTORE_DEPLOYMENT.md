@@ -11,37 +11,50 @@ Two consequences of this choice:
 1. **Apple Silicon only.** The app appears only on M-series Macs running macOS 11+. Intel Macs won't see it. That's fine for a modern pharmacy audience but worth knowing.
 2. **It must pass iOS review first.** The Mac availability is downstream of an approved iOS app. Apple's review (especially Guideline 4.2, below) is stricter than Google's, so plan for that.
 
-Your app is a Capacitor 8 shell (`appId: ca.remedypills.app`, appName **Remedy Pills Pharmacy**) that loads the live site `https://app.remedypills.ca`, exactly like the Android build. iOS platform is already scaffolded in `ios/`, and `@capacitor/local-notifications` is already a dependency — that matters for review.
+Your app is a Capacitor 8 shell (`appId: ca.remedypills.app`, appName **Remedy Pills Pharmacy**) that loads the live server, exactly like the Android build that is now live on Google Play.
+
+⚠️ **The shell currently loads `https://remedypillspharmacyapp-production.up.railway.app`**, not `app.remedypills.ca` — see `productionUrl` in `capacitor.config.ts`. The custom domain isn't verified yet, and pointing the shell at a domain that doesn't resolve ships an app that opens to a blank error page (an automatic rejection). Use the Railway URL everywhere below until the custom domain is live, then change it in one place (`capacitor.config.ts`) and rebuild.
+
+iOS is scaffolded in `ios/`, and both native features Apple's Guideline 4.2 cares about are implemented: local notifications (`@capacitor/local-notifications`) and a Face ID/Touch ID app lock (`@aparajita/capacitor-biometric-auth`).
 
 ---
 
 ## Stage 1 — Backend must be live (already done for Play)
 
-Same prerequisite as the Play Store guide: the app is an empty screen until `https://app.remedypills.ca` is serving. Since your Android build is already submitted, this is presumably already true. Before an Apple reviewer opens the app, re-confirm:
+Same prerequisite as the Play Store guide: the app is an empty screen until the server is serving. Android is live on Google Play, so this already holds — but re-confirm before an Apple reviewer opens it:
 
-1. Registration, login, prescriptions, appointments all work at `https://app.remedypills.ca` in Safari.
-2. Privacy policy renders at a public URL, e.g. `https://app.remedypills.ca/privacy`. Apple checks this link and **also** requires an in-app link to it.
-3. If you ever move off `app.remedypills.ca`, update `productionUrl` in `capacitor.config.ts` before building.
+1. Registration, login, prescriptions, appointments all work at `https://remedypillspharmacyapp-production.up.railway.app` in Safari.
+2. Privacy policy renders publicly at `https://remedypillspharmacyapp-production.up.railway.app/privacy-policy` (verified working; it redirects to `/privacy`). Apple checks this link and **also** requires an in-app link to it.
+3. Whenever the URL changes, update `productionUrl` in `capacitor.config.ts` and rebuild — the shipped binary hard-codes it.
 
-## Stage 2 — Apple Developer Program enrollment (start this now)
+**On the Railway URL vs. a custom domain.** Reviewers will see a `railway.app` address in the address-less WebView only indirectly, so this is not a rejection risk on its own. But moving to `app.remedypills.ca` later means shipping a new build. If you intend to use the custom domain, it's cheaper to finish the DNS work *before* the first submission than to ship 1.1.0 on Railway and 1.2.0 on the custom domain.
 
-You don't have an account yet, and enrollment is the long pole — start it before touching Xcode.
+## Stage 2 — Apple Developer Program enrollment ✅ SUBMITTED
 
-1. Go to `developer.apple.com/programs/enroll`. Cost is **US $99/year** (same for individuals and organizations).
-2. **Enroll as an organization** using your pharmacy's legal entity, not a personal account. A health app under a real business name reviews more smoothly, and org accounts let you manage roles later.
-3. Organization enrollment requires a **D-U-N-S number** — a free nine-digit business identifier from Dun & Bradstreet. ✅ **Already obtained:**
+Organization enrollment was submitted on **2026-08-12** under Apple Account `info@remedypills.ca`.
 
-   | Field | Value |
-   |---|---|
-   | Legal entity name | **Remedy Pills Inc** |
-   | D-U-N-S Number | **24-337-1905** (`243371905`) |
+**Enrollment ID: `MHH8W6VX3X`**
 
-   ⚠️ **Enter the legal entity name exactly as `Remedy Pills Inc`** during enrollment — Apple matches it character-for-character against the Dun & Bradstreet record. Do **not** enter "Remedy Pills Pharmacy" (the trade/app name) in the legal entity field; a mismatch is the most common cause of enrollment rejection and restarts the review. The address and phone you give Apple must also match the D&B record.
+| Field | Submitted |
+|---|---|
+| Entity type | Company / Organization |
+| Legal entity name | Remedy Pills Inc |
+| D-U-N-S | 243371905 |
+| Address | 246 Nolanridge Cres NW Unit 135, Calgary, Alberta, T3R 1W9, CA |
+| Website | www.remedypills.ca |
 
-   You also need legal authority to bind the organization to Apple's agreement. Total org enrollment commonly takes **1–2 weeks**.
-4. Once enrolled, sign the latest **Paid Apps Agreement** in App Store Connect → Business. **This matters for the Mac step:** Apple only auto-distributes your iOS apps to Apple Silicon Macs after this agreement is signed.
+Apple pulled the address straight from the Dun & Bradstreet record and it matched, so the entity data is clean.
 
-While you wait for enrollment, do Stages 3–4 up to the point of needing a signing team.
+**Remaining, in order:**
+
+1. **Apple verifies signing authority.** They often **phone the D&B business number** (+1 403-980-7003). Make sure it's answered and that whoever answers can confirm Adeel Siddiqui is an owner/officer — an unanswered call is the top cause of multi-week delays.
+2. **Apple emails `info@remedypills.ca`** with completion instructions (check spam).
+3. **Pay US $99** and accept the **Apple Developer Program License Agreement**.
+4. **Sign the Paid Apps Agreement** in App Store Connect → Business. **This one matters for the Mac step** — Apple only distributes iOS apps to Apple Silicon Macs once it's signed.
+
+If nothing arrives within ~10 business days, contact Apple quoting the Enrollment ID.
+
+Everything in Stages 3–4 can be done now, up to the point of needing a signing Team in Xcode.
 
 ## Stage 3 — Prerequisites (on your Mac)
 
@@ -64,28 +77,37 @@ npx cap open ios
 
 `cap sync` copies config and installs pods; `cap open ios` opens `ios/App/App.xcworkspace` in Xcode. **Always open the `.xcworkspace`, never the `.xcodeproj`.**
 
-### 4b. App icons
+### 4b. App icons ✅ already correct
 
-You have `@capacitor/assets` installed. Put a 1024×1024 master icon at `assets/icon.png` (no transparency, no rounded corners — Apple applies the mask) and run:
+Verified: `ios/App/App/Assets.xcassets/AppIcon.appiconset/AppIcon-512@2x.png` is a valid **1024×1024** icon with a correct `Contents.json`, and `assets/icon.png` (the 1024×1024 master) is in place. Nothing to do.
+
+Only if you change the artwork, re-run:
 
 ```bash
 npx @capacitor/assets generate --ios
 ```
 
-This fills the iOS icon set. The **1024×1024 App Store icon** is also uploaded in App Store Connect.
+The master must have no transparency and no rounded corners — Apple applies the mask. The same 1024×1024 image is uploaded separately in App Store Connect.
 
 ### 4c. Signing and identifiers in Xcode
 
 In Xcode, select the **App** target → **Signing & Capabilities**:
 
 - **Bundle Identifier:** `ca.remedypills.app` (matches `capacitor.config.ts` — keep it identical).
-- **Team:** your organization team (appears after Stage 2 enrollment).
+- **Team:** your organization team. ⚠️ This is the **only** field that can't be set until enrollment completes — everything else is ready.
 - Leave **Automatically manage signing** on. Xcode creates the App ID, certificates, and provisioning profile for you.
-- **Version** (`CFBundleShortVersionString`): `1.0`. **Build** (`CFBundleVersion`): `1`. Every upload must increment the build number.
+- **Version** (`CFBundleShortVersionString`): **`1.1.0`** — already set, matching Android's versionName. **Build** (`CFBundleVersion`): **`1`** — correct for the first iOS upload. Every *subsequent* upload must increment the build number.
 
-Because `@capacitor/local-notifications` is present, confirm the notifications capability is wired and that the app requests permission at a sensible moment (not on cold launch).
+**Info.plist ✅ already configured.** Both required keys are committed:
 
-**Face ID (required Info.plist key).** The app now includes a biometric app-lock (`@aparajita/capacitor-biometric-auth`, toggle in Account → Security). For Face ID to work you **must** add the `NSFaceIDUsageDescription` key to `ios/App/App/Info.plist` — Apple rejects/ crashes the app without it. Example value: *"Remedy Pills uses Face ID to lock the app so only you can view your prescriptions and health information."* Run `npm install && npx cap sync ios` after pulling this code so the native plugin is installed.
+| Key | Value | Why |
+|---|---|---|
+| `NSFaceIDUsageDescription` | "Remedy Pills uses Face ID to lock the app so only you can view your prescriptions and health information." | Face ID crashes/rejects without it |
+| `UIRequiredDeviceCapabilities` | `arm64` | Was the legacy `armv7`, which could have blocked Apple Silicon Mac eligibility |
+
+After pulling this code, run `npm install && npx cap sync ios` so both native plugins (`local-notifications`, `biometric-auth`) are installed into the Xcode project. `cap sync` does **not** overwrite `Info.plist`, so these keys survive.
+
+Local notifications need no extra capability for *local* (non-push) delivery. The app requests permission only when the user enables the Reminders toggle — deliberately, not on cold launch, which reviewers dislike.
 
 ### 4d. Archive and upload
 
@@ -118,7 +140,7 @@ Declare **no tracking** and **no third-party analytics/ads SDKs** (true — the 
 
 **Age rating:** complete the questionnaire; answer no to violence/sexual/gambling content. A pharmacy utility rates **4+**. Do not target children.
 
-**App privacy policy URL:** `https://app.remedypills.ca/privacy`.
+**App privacy policy URL:** `https://remedypillspharmacyapp-production.up.railway.app/privacy-policy`.
 
 **Sign in with Apple — resolved by disabling Google on iOS.** ⚠️ This changed once native Google sign-in was added for Android. Guideline 4.8 (Login Services) requires an app offering a third-party social login to *also* offer an equivalent privacy-preserving option — in practice, Sign in with Apple. It's a frequent rejection.
 
@@ -159,7 +181,7 @@ Reuse and lightly adapt the copy from the Play guide:
 
 **Keywords (100 chars, comma-separated):** "pharmacy,prescription,refill,medication,reminder,pharmacist,appointment,health,Remedy Pills"
 
-**Support URL:** a public contact page, e.g. `https://app.remedypills.ca` or a support page. **Marketing URL:** optional.
+**Support URL:** a public contact page, e.g. `https://remedypillspharmacyapp-production.up.railway.app` or a support page. **Marketing URL:** optional.
 
 ## Stage 8 — Submit for review
 

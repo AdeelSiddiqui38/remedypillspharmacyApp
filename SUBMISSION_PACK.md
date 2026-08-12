@@ -147,9 +147,9 @@ Remedy Pills Pharmacy — Unit #135, 246 Nolanridge Crescent NW, Calgary, AB T3R
 pharmacy,prescription,refill,medication,reminder,pharmacist,appointment,health,calgary,rx
 ```
 
-**Support URL:** `https://app.remedypills.ca`
+**Support URL:** `https://remedypillspharmacyapp-production.up.railway.app`
 **Marketing URL:** (optional — your main pharmacy site)
-**Privacy Policy URL:** `https://app.remedypills.ca/privacy`
+**Privacy Policy URL:** `https://remedypillspharmacyapp-production.up.railway.app/privacy-policy`
 
 ## 3. App Review Information — CRITICAL
 
@@ -213,6 +213,12 @@ Google sign-in is **disabled on iOS**; the iOS build offers email/password only,
 
 If a reviewer asks why sign-in options differ from the Android app, the answer is: the iOS build intentionally offers only email/password.
 
+**One nuance.** `@capgo/capacitor-social-login` is a shared dependency, so the Google Sign-In SDK is still *linked* into the iOS binary even though iOS never calls it (`isSocialLoginAvailable()` returns false, and `signInWithGoogle()` throws as a second guard). Apple does scan binaries, so if review asks about the presence of Google Sign-In:
+
+> The Google Sign-In SDK is present because Android and iOS share one codebase, but the iOS build never invokes it — Google sign-in is disabled on iOS and the button is not rendered. iOS offers email/password only.
+
+This is accurate and not a 4.8 violation: 4.8 governs what login options the app *offers*, not what code is linked. If you'd rather remove the SDK from the iOS binary entirely, that requires excluding the plugin from the iOS platform in the Capacitor config — worth doing only if a reviewer actually raises it.
+
 ## 4. App Privacy (nutrition label)
 
 Answer **"Yes, we collect data."** Then, for every item below: **Linked to the user = Yes**, **Used for tracking = No**, **Purpose = App Functionality**.
@@ -254,16 +260,38 @@ npx cap open ios              # opens App.xcworkspace
 
 In Xcode: select the **App** target → **Signing & Capabilities** → set **Team** to your org → confirm Bundle Identifier is `ca.remedypills.app` → device selector to **Any iOS Device (arm64)** → **Product → Archive** → **Distribute App → App Store Connect → Upload**.
 
-Already handled in the repo (no action needed): `NSFaceIDUsageDescription` is set, and `UIRequiredDeviceCapabilities` was corrected from the legacy `armv7` to `arm64` — the old value could have blocked Apple Silicon Mac compatibility.
+**Already handled in the repo — no action needed:**
+
+- `NSFaceIDUsageDescription` set in `Info.plist` (Face ID fails without it)
+- `UIRequiredDeviceCapabilities` corrected from legacy `armv7` → `arm64` (the old value could have blocked Apple Silicon Mac eligibility)
+- iOS version set to **1.1.0**, build **1**
+- App icon verified: 1024×1024 with valid `Contents.json`
+- Google sign-in disabled on iOS (Guideline 4.8 — see §3b)
+- Share App link made platform-aware (no longer points iOS users at Google Play)
+- In-app account deletion implemented (Guideline 5.1.1(v))
+- Both native features wired: medication-reminder notifications and Face ID app lock
+
+The **only** thing that can't be done until enrollment completes is setting the signing **Team** in Xcode.
 
 ## 7. Enable Mac availability
 
 App Store Connect → your app → **Pricing and Availability** → **"iPhone and iPad Apps on Apple Silicon Macs"** → ensure it is **enabled**. It defaults on once the Paid Apps Agreement is signed. This is the entire "Mac App Store" step.
 
+## 7b. What you can do NOW, while Apple verifies enrollment
+
+None of these need a Developer account:
+
+- ☐ **Capture screenshots** (§5). Run the app in the iOS Simulator via Xcode — no signing needed. This is the most time-consuming remaining task, so front-load it.
+- ☐ **Seed the reviewer account** (§3): `REVIEWER_BOOTSTRAP_PASSWORD='…' npm run seed:reviewer`
+- ☐ **Verify in-app account deletion** works end-to-end (Apple actively tests this)
+- ☐ **Decide the domain question**: ship on the Railway URL, or finish `app.remedypills.ca` DNS first and avoid a second build (see `MACSTORE_DEPLOYMENT.md` Stage 1)
+- ☐ **Run `npm install && npx cap sync ios`** and confirm the Xcode project opens cleanly
+- ☐ **Test on a real iPhone** via a free personal signing profile — catches blank-screen/backend issues before a reviewer sees them
+
 ## 8. Final pre-submit checks
 
-- ☐ `https://app.remedypills.ca` loads and login works in Safari right now
-- ☐ `https://app.remedypills.ca/privacy` loads publicly
+- ☐ `https://remedypillspharmacyapp-production.up.railway.app` loads and login works in Safari right now
+- ☐ `https://remedypillspharmacyapp-production.up.railway.app/privacy-policy` loads publicly
 - ☐ Demo account works from a fresh install
 - ☐ Reminder notification fires with the app closed (test on a real device)
 - ☐ Face ID lock engages on relaunch
