@@ -68,13 +68,19 @@ export async function signInWithGoogle(): Promise<boolean> {
 
   let idToken: string | null = null;
   try {
-    // Scopes are passed explicitly, as the plugin's Android example does.
-    // These are the same two the web redirect flow requests, and they are the
-    // only ones the server needs — it reads the account from the verified ID
-    // token, nothing more.
+    // Do NOT pass `scopes`. The Android plugin already requests
+    // userinfo.email, userinfo.profile and openid — everything the server needs
+    // — and supplying a scopes array is only for *additional* scopes, which
+    // requires subclassing MainActivity and fails outright without it.
+    //
+    // `style: "bottom"` picks Credential Manager's GetGoogleIdOption instead of
+    // GetSignInWithGoogleOption. They are different credential types, and the
+    // latter was failing with [16] Account reauth failed on every account.
+    // `forcePrompt` disables authorized-account filtering and auto-select, so a
+    // stale cached credential can't be reused — which is what [16] describes.
     const { result } = await SocialLogin.login({
       provider: "google",
-      options: { scopes: ["email", "profile"] },
+      options: { style: "bottom", forcePrompt: true },
     });
     // 'online' mode (the default) is the one that returns an ID token.
     if ("idToken" in result) idToken = result.idToken;
