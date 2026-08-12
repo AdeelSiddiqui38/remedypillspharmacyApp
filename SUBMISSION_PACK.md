@@ -12,7 +12,9 @@ Companion to `MACSTORE_DEPLOYMENT.md` (which explains the *why*); this file is t
 | # | Step | Who | Status |
 |---|---|---|---|
 | 0 | D-U-N-S number for Remedy Pills Inc | You | ☑ `24-337-1905` |
-| 1 | Apple Developer Program enrollment | **You** (payment + identity) | ☐ |
+| 1 | Apple Developer Program enrollment **submitted** | You | ☑ ID `MHH8W6VX3X` — awaiting Apple |
+| 1b | Apple verifies signing authority → emails instructions | Apple | ☐ |
+| 1c | Pay US $99 membership | **You** (payment) | ☐ |
 | 2 | Sign Paid Apps Agreement | **You** (legal) | ☐ |
 | 3 | Native build prep (code, Info.plist) | **Claude — done** | ☑ |
 | 4 | `npm install && npx cap sync ios` | You (your Mac) | ☐ |
@@ -24,6 +26,33 @@ Companion to `MACSTORE_DEPLOYMENT.md` (which explains the *why*); this file is t
 | 9 | Submit for Review | **You** (legal declaration) | ☐ |
 
 ---
+
+## 0a. Enrollment status — submitted 2026-08-12
+
+**Enrollment ID: `MHH8W6VX3X`** — quote this in any correspondence with Apple.
+
+Submitted exactly as accepted by Apple:
+
+| Field | Submitted value |
+|---|---|
+| Entity type | Company / Organization |
+| Legal Entity Name | Remedy Pills Inc |
+| D-U-N-S | 243371905 |
+| Address | 246 Nolanridge Cres NW Unit 135, Calgary, ALBERTA, T3R 1W9, CA |
+| Website | www.remedypills.ca |
+| Work email | info@remedypills.ca |
+| Account Holder | Adeel Siddiqui, +1 (403) 980-7003 |
+
+Apple's message: *"Once we verify your authority to sign legal agreements, we'll email you with instructions on how to complete your enrollment."*
+
+**What happens next, in order:**
+
+1. Apple verifies your authority to bind Remedy Pills Inc. They frequently **phone the business number on the D&B record** — make sure +1 403-980-7003 is answered, and that whoever answers can confirm Adeel Siddiqui is an owner/officer. This is the single most common cause of delay.
+2. Apple emails **info@remedypills.ca** with instructions. Watch that inbox, including spam.
+3. You then pay the **US $99** membership and accept the **Apple Developer Program License Agreement**.
+4. After that, sign the **Paid Apps Agreement** in App Store Connect → Business — required before the app can be distributed, and before the "iPhone/iPad apps on Apple Silicon Macs" toggle takes effect.
+
+Typical timeline is a few days to two weeks. If nothing arrives in ~10 business days, contact Apple with the Enrollment ID above.
 
 ## 0b. Company / enrollment details
 
