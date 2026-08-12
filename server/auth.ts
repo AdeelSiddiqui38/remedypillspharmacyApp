@@ -5,6 +5,7 @@ import { Express } from "express";
 import session from "express-session";
 import { scrypt, randomBytes, timingSafeEqual } from "crypto";
 import { promisify } from "util";
+import { OAuth2Client } from "google-auth-library";
 import { storage } from "./storage";
 import { deletePatientAccount } from "./retention";
 import { authLimiter } from "./security";
@@ -18,6 +19,11 @@ declare global {
 }
 
 const scryptAsync = promisify(scrypt);
+
+// Verifies ID tokens from the native Google SDK. Caches Google's signing keys
+// internally, so this is created once rather than per request.
+const googleTokenClient = new OAuth2Client();
+
 const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_MINUTES = 15;
 const SESSION_MAX_AGE = 30 * 60 * 1000;
@@ -451,7 +457,67 @@ export function setupAuth(app: Express) {
   app.get("/api/auth/providers", (_req, res) => {
     res.json({
       google: !!(process.env.GOOGLE_CLIENT_ID && process.env.GOOGLE_CLIENT_SECRET),
+      // The native shell needs this to initialise Google's SDK. An OAuth client
+      // ID is not a secret — it travels in the query string of every redirect
+      // in the web flow. The client *secret* stays on the server.
+      googleClientId: process.env.GOOGLE_CLIENT_ID || null,
     });
+  });
+
+  // Native Google Sign-In.
+  //
+  // The redirect flow above cannot be used inside the Capacitor shell: Google
+  // rejects OAuth from embedded WebViews with `disallowed_useragent`. So the
+  // app signs in with Google's native SDK and posts the resulting ID token
+  // here, which is verified against Google's public keys before a session is
+  // issued. Never trust the profile fields the client sends — everything below
+  // comes from the verified token payload.
+  app.post("/api/auth/google/native", authLimiter, async (req, res, next) => {
+    const clientId = process.env.GOOGLE_CLIENT_ID;
+    if (!clientId) {
+      return res.status(503).json({ message: "Google sign-in is not configured" });
+    }
+
+    const idToken = req.body?.idToken;
+    if (typeof idToken !== "string" || idToken.length === 0) {
+      return res.status(400).json({ message: "idToken is required" });
+    }
+
+    let payload;
+    try {
+      const ticket = await googleTokenClient.verifyIdToken({ idToken, audience: clientId });
+      payload = ticket.getPayload();
+    } catch {
+      return res.status(401).json({ message: "Invalid Google token" });
+    }
+
+    if (!payload?.sub) {
+      return res.status(401).json({ message: "Invalid Google token" });
+    }
+    // Without this an attacker could register an unverified Google address
+    // that belongs to somebody else and claim their patient record.
+    if (!payload.email_verified) {
+      return res.status(403).json({ message: "Your Google email address is not verified" });
+    }
+
+    try {
+      const user = await findOrCreateSocialUser("google", payload.sub, {
+        name: payload.name,
+        email: payload.email,
+      });
+      if (user.deletedAt) {
+        return res.status(403).json({ message: "This account has been deleted" });
+      }
+      await storage.updateUserLoginTracking(user.id, {
+        lastLoginAt: new Date().toISOString(),
+      });
+      req.login(user, (loginErr) => {
+        if (loginErr) return next(loginErr);
+        res.json(sanitizeUser(user));
+      });
+    } catch (err) {
+      next(err);
+    }
   });
 }
 

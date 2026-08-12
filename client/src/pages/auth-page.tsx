@@ -1,13 +1,13 @@
 import { useState, useCallback, useEffect } from "react";
 import { useAuth } from "@/hooks/use-auth";
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { Redirect } from "wouter";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ArrowLeft, ChevronRight } from "lucide-react";
-import { isSocialLoginAvailable } from "@/lib/social-auth";
+import { isSocialLoginAvailable, signInWithGoogle } from "@/lib/social-auth";
 import remedyLogo from "@assets/Remedypills_logo_1_1771941028931.png";
 import heroImage from "@assets/WhatsApp_Image_2026-02-24_at_23.04.48_1772000003452.jpeg";
 
@@ -37,7 +37,9 @@ export default function AuthPage() {
   const [showPrivacy, setShowPrivacy] = useState(false);
   const [showTerms, setShowTerms] = useState(false);
   const [oauthError, setOauthError] = useState<string | null>(null);
+  const [socialPending, setSocialPending] = useState(false);
   const socialLogin = isSocialLoginAvailable();
+  const queryClient = useQueryClient();
 
   // Check for OAuth errors in URL query params
   useEffect(() => {
@@ -69,7 +71,7 @@ export default function AuthPage() {
     }
   };
 
-  const { data: providers } = useQuery<{ google: boolean }>({
+  const { data: providers } = useQuery<{ google: boolean; googleClientId: string | null }>({
     queryKey: ["/api/auth/providers"],
   });
 
@@ -98,16 +100,27 @@ export default function AuthPage() {
     });
   };
 
-  const handleSocialLogin = (provider: "google") => {
+  const handleSocialLogin = async (provider: "google") => {
     if (!providers) {
-      alert("Social providers not loaded yet. Please try again.");
+      setOauthError("Still loading sign-in options. Please try again in a moment.");
       return;
     }
     if (!providers[provider]) {
-      alert(`${provider} login is not enabled on this server.`);
+      setOauthError("Google sign-in is not enabled on this server.");
       return;
     }
-    window.location.href = `/api/auth/${provider}`;
+    setOauthError(null);
+    setSocialPending(true);
+    try {
+      // Web navigates away; native resolves here once the session exists, so
+      // the cached user has to be refetched before routing on.
+      const signedIn = await signInWithGoogle();
+      if (signedIn) await queryClient.invalidateQueries({ queryKey: ["/api/user"] });
+    } catch (err: any) {
+      setOauthError(err?.message || "Google sign-in failed. Please try again.");
+    } finally {
+      setSocialPending(false);
+    }
   };
 
   if (screen === "landing") {
@@ -204,11 +217,11 @@ export default function AuthPage() {
                     className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 text-sm font-medium text-white transition hover:bg-white/10"
                     onClick={() => handleSocialLogin("google")}
                     data-testid="button-google-login"
-                    disabled={providers ? !providers.google : false}
+                    disabled={socialPending || (providers ? !providers.google : false)}
                     title={providers && !providers.google ? "Google sign-in not configured" : undefined}
                   >
                     <GoogleIcon />
-                    Continue with Google
+                    {socialPending ? "Signing in…" : "Continue with Google"}
                   </button>
                 </div>
 
@@ -310,11 +323,11 @@ export default function AuthPage() {
                   className="flex h-12 w-full items-center justify-center gap-3 rounded-full border border-white/15 bg-white/5 text-sm font-medium text-white transition hover:bg-white/10"
                   onClick={() => handleSocialLogin("google")}
                   data-testid="button-google-register"
-                  disabled={providers ? !providers.google : false}
+                  disabled={socialPending || (providers ? !providers.google : false)}
                   title={providers && !providers.google ? "Google sign-in not configured" : undefined}
                 >
                   <GoogleIcon />
-                  Sign up with Google
+                  {socialPending ? "Signing in…" : "Sign up with Google"}
                 </button>
               </div>
 
