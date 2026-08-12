@@ -178,6 +178,12 @@ Creates username **`appstore-review`** with entirely synthetic data — 3 prescr
 
 **Contact:** Adeel Siddiqui · +1 403-980-7003 · info@remedypills.ca — Apple uses this if they have questions during review, so make sure it's monitored while the app is in review.
 
+## 3b. Login services (Guideline 4.8) — already handled
+
+Google sign-in is **disabled on iOS**; the iOS build offers email/password only, so Sign in with Apple is not required. Nothing to do at submission time — just don't re-enable Google for iOS without shipping Sign in with Apple alongside it. Full explanation in `MACSTORE_DEPLOYMENT.md` §5.
+
+If a reviewer asks why sign-in options differ from the Android app, the answer is: the iOS build intentionally offers only email/password.
+
 ## 4. App Privacy (nutrition label)
 
 Answer **"Yes, we collect data."** Then, for every item below: **Linked to the user = Yes**, **Used for tracking = No**, **Purpose = App Functionality**.

@@ -120,7 +120,14 @@ Declare **no tracking** and **no third-party analytics/ads SDKs** (true — the 
 
 **App privacy policy URL:** `https://app.remedypills.ca/privacy`.
 
-**Sign in with Apple:** **not required** here — you use your own email/password login, not a third-party social login, so the "must also offer Sign in with Apple" rule doesn't apply. (Only triggered if you add Google/Facebook login.)
+**Sign in with Apple — resolved by disabling Google on iOS.** ⚠️ This changed once native Google sign-in was added for Android. Guideline 4.8 (Login Services) requires an app offering a third-party social login to *also* offer an equivalent privacy-preserving option — in practice, Sign in with Apple. It's a frequent rejection.
+
+Google sign-in was not platform-gated, so the button would have appeared on iOS. It is now disabled there (`client/src/lib/social-auth.ts` returns `false` when `Capacitor.getPlatform() === "ios"`), leaving iOS with **email/password only**. 4.8 therefore does not apply and Sign in with Apple is not required for this submission. Android keeps Google sign-in.
+
+Two consequences:
+
+- A patient who registered via *Google on Android* can't sign in on iOS unless their account has a password. Worth a support note when promoting the iOS app to existing users.
+- To enable Google on iOS later you must ship Sign in with Apple **at the same time**, plus the iOS Google config (`CFBundleURLTypes` with the reversed client ID, and `GIDClientID` in `Info.plist`) — none of which exists today. Remove the gate only as part of that work.
 
 **App Review Information — demo account:** the app is login-gated, so provide working reviewer credentials. Create a dedicated test patient (e.g. `appstore-review`, strong password, no real health data). Add notes explaining the app loads the live pharmacy site and what to test (refills, reminders, appointments).
 
