@@ -3,6 +3,7 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { apiRequest } from "@/lib/queryClient";
 import { useAuth } from "@/hooks/use-auth";
 import { useToast, toast } from "@/hooks/use-toast";
+import { Capacitor } from "@capacitor/core";
 import BiometricSetting from "@/components/biometric-setting";
 import ReminderNotificationsToggle from "@/components/reminder-notifications-toggle";
 import { syncReminderNotifications } from "@/lib/reminder-notifications";
@@ -2307,7 +2308,27 @@ function CalorieTracker() {
 // installed app that origin is the Railway URL the WebView loads — sharing it
 // would just open a browser tab for whoever receives it, not get them to
 // install the app. The whole point of this card is new installs.
-const APP_SHARE_URL = "https://play.google.com/store/apps/details?id=ca.remedypills.app";
+const PLAY_STORE_URL = "https://play.google.com/store/apps/details?id=ca.remedypills.app";
+
+// Filled in once the App Store listing is live — Apple assigns the numeric id
+// at first submission. Until then iOS shares the website, which is honest and
+// avoids pointing Apple users at Google Play (a bad look in App Store review).
+const APP_STORE_URL: string | null = null;
+
+const WEBSITE_URL = "https://remedypills.ca";
+
+/**
+ * Where "share the app" should send someone, based on the device doing the
+ * sharing. An iPhone user handing this to a friend is almost certainly handing
+ * it to another iPhone user.
+ */
+function appShareUrl(): string {
+  const platform = Capacitor.getPlatform();
+  if (platform === "ios") return APP_STORE_URL ?? WEBSITE_URL;
+  if (platform === "android") return PLAY_STORE_URL;
+  // Plain browser: Play Store is the only live listing today.
+  return PLAY_STORE_URL;
+}
 
 function ShareAppCard() {
   const [mode, setMode] = useState<"share" | "qr" | "nfc">("share");
@@ -2326,11 +2347,11 @@ function ShareAppCard() {
         await navigator.share({
           title: "Remedy Pills Pharmacy",
           text: "Manage your prescriptions, book appointments, and track your health with Remedy Pills Pharmacy. Download the app:",
-          url: APP_SHARE_URL,
+          url: appShareUrl(),
         });
       } catch {}
     } else {
-      await navigator.clipboard.writeText(APP_SHARE_URL);
+      await navigator.clipboard.writeText(appShareUrl());
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     }
@@ -2349,7 +2370,7 @@ function ShareAppCard() {
       const ndef = new NDEFReader();
       nfcAbortRef.current = new AbortController();
       await ndef.write(
-        { records: [{ recordType: "url", data: APP_SHARE_URL }] },
+        { records: [{ recordType: "url", data: appShareUrl() }] },
         { signal: nfcAbortRef.current.signal },
       );
       setNfcStatus("success");
@@ -2414,7 +2435,7 @@ function ShareAppCard() {
           <div className="space-y-3">
             <div className="rounded-2xl border border-gray-100 bg-gray-50 p-3">
               <p className="text-xs text-muted-foreground">App Link</p>
-              <p className="mt-1 break-all text-sm font-medium" data-testid="text-share-url">{APP_SHARE_URL}</p>
+              <p className="mt-1 break-all text-sm font-medium" data-testid="text-share-url">{appShareUrl()}</p>
             </div>
             <Button onClick={handleShareSheet} className="w-full rounded-2xl" data-testid="button-share-sheet">
               <Share2 className="mr-2 h-4 w-4" />
@@ -2427,7 +2448,7 @@ function ShareAppCard() {
           <div className="flex flex-col items-center space-y-3">
             <div className="rounded-3xl border bg-white p-4" data-testid="qr-code-container">
               <QRCodeSVG
-                value={APP_SHARE_URL}
+                value={appShareUrl()}
                 size={200}
                 bgColor="#ffffff"
                 fgColor="#0e7490"

@@ -34,6 +34,13 @@ function isEmbeddedWebView(): boolean {
  */
 export function isSocialLoginAvailable(): boolean {
   if (Capacitor.isNativePlatform()) {
+    // iOS: deliberately off. App Store Review Guideline 4.8 (Login Services)
+    // requires that an app offering a third-party social login also offer an
+    // equivalent privacy-preserving option — in practice Sign in with Apple.
+    // Until that exists, offering Google here is a guaranteed rejection, so
+    // iOS uses email/password only. Remove this branch when Sign in with
+    // Apple ships.
+    if (Capacitor.getPlatform() === "ios") return false;
     return Capacitor.isPluginAvailable("SocialLogin");
   }
   // Plain browser: the redirect path works. Other WebViews: neither does.
@@ -52,6 +59,13 @@ export async function signInWithGoogle(): Promise<boolean> {
   if (!Capacitor.isNativePlatform()) {
     window.location.href = "/api/auth/google";
     return true;
+  }
+
+  // Belt and braces alongside isSocialLoginAvailable(): this web bundle is
+  // served to whatever shell is installed, so a stale build could still reach
+  // here on iOS. See the Guideline 4.8 note above.
+  if (Capacitor.getPlatform() === "ios") {
+    throw new Error("Google sign-in is not available on iOS. Please sign in with your email and password.");
   }
 
   const providers = await fetch("/api/auth/providers", { credentials: "include" })
