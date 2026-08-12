@@ -323,14 +323,16 @@ export default function AdminPage() {
 
         {activeTab === "patients" && (
           <Card className="rounded-3xl border-card-border bg-card/70 shadow-sm backdrop-blur-xl">
-            <CardHeader className="flex flex-row items-center justify-between gap-3">
+            {/* Title on its own line on a phone, so the search field keeps a
+                usable width instead of collapsing to a few characters. */}
+            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <CardTitle className="shrink-0 text-base">Registered Patients</CardTitle>
-              <div className="flex items-center gap-2">
+              <div className="flex w-full items-center gap-2 sm:w-auto">
                 <Input
                   placeholder="Search patients..."
                   value={patientSearch}
                   onChange={(e) => setPatientSearch(e.target.value)}
-                  className="max-w-xs rounded-2xl"
+                  className="w-full rounded-2xl sm:max-w-xs"
                   data-testid="input-patient-search"
                 />
                 <Button size="sm" className="shrink-0 rounded-2xl" onClick={() => setShowAddPatientModal(true)} data-testid="button-add-patient">
@@ -344,25 +346,26 @@ export default function AdminPage() {
                   {patients.length === 0 ? "No patients registered yet." : "No patients match your search."}
                 </p>
               ) : (
+                // Rows stack on a phone. Side by side, the action buttons are
+                // ~300px of shrink-0 content, which squeezes the details column
+                // to a sliver and wraps the email one character per line. Full
+                // width on its own row is the only thing that actually reads.
                 filteredPatients.map((p) => (
-                  <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-background/60 p-4" data-testid={`admin-patient-${p.id}`}>
-                    {/* min-w-0 lets this column shrink; without it a long email
-                        keeps the row wider than the screen and the whole page
-                        scrolls sideways on a phone. */}
-                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <div key={p.id} className="flex flex-col gap-3 rounded-2xl border bg-background/60 p-4 sm:flex-row sm:items-center sm:justify-between" data-testid={`admin-patient-${p.id}`}>
+                    <div className="flex min-w-0 items-center gap-3">
                       <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                         {(p.name || p.username).charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0">
                         <p className="truncate text-sm font-semibold">{p.name || p.username}</p>
-                        <p className="break-words text-xs text-muted-foreground">
+                        <p className="break-all text-xs text-muted-foreground">
                           {p.email || "No email"}
                           {p.phone && <> &middot; {p.phone}</>}
                           {p.dob && <> &middot; DOB: {p.dob}</>}
                         </p>
                       </div>
                     </div>
-                    <div className="flex shrink-0 items-center gap-2">
+                    <div className="flex shrink-0 flex-wrap items-center gap-2">
                       {p.phone && (
                         <Badge variant="outline" className="rounded-full text-xs">
                           <Phone className="mr-1 h-3 w-3" /> SMS
@@ -389,7 +392,7 @@ export default function AdminPage() {
 
         {activeTab === "notifications" && (
           <Card className="rounded-3xl border-card-border bg-card/70 shadow-sm backdrop-blur-xl">
-            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
+            <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <CardTitle className="text-base">Notifications</CardTitle>
               {unreadNotifications > 0 && (
                 <Button
@@ -530,7 +533,7 @@ export default function AdminPage() {
         {activeTab === "communications" && (
           <div className="space-y-4">
             <Card className="rounded-3xl border-card-border bg-card/70 shadow-sm backdrop-blur-xl">
-              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
+              <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <CardTitle className="text-base">Mass SMS / MMS</CardTitle>
                   <p className="mt-1 text-xs text-muted-foreground">Send text messages to all patients with phone numbers. Attach flyers or images.</p>
@@ -554,7 +557,7 @@ export default function AdminPage() {
             </Card>
 
             <Card className="rounded-3xl border-card-border bg-card/70 shadow-sm backdrop-blur-xl">
-              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
+              <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <CardTitle className="text-base">Push Notifications</CardTitle>
                   <p className="mt-1 text-xs text-muted-foreground">Broadcast in-app alerts for drug recalls, holiday hours, vaccine availability, and more.</p>
@@ -586,7 +589,7 @@ export default function AdminPage() {
         {activeTab === "offers" && (
           <div className="space-y-4">
             <Card className="rounded-3xl border-card-border bg-card/70 shadow-sm backdrop-blur-xl">
-              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
+              <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <CardTitle className="text-base">Promotional Offers</CardTitle>
                   <p className="mt-1 text-xs text-muted-foreground">Manage the promotional banner shown to patients on the home screen.</p>
@@ -599,8 +602,8 @@ export default function AdminPage() {
                 {promoBanners.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No promotional offers yet. Create one to display on the patient home screen.</p>
                 ) : promoBanners.map((b) => (
-                  <div key={b.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-background/60 p-4" data-testid={`promo-item-${b.id}`}>
-                    <div className="flex min-w-0 flex-1 items-center gap-3">
+                  <div key={b.id} className="flex flex-col gap-3 rounded-2xl border bg-background/60 p-4 sm:flex-row sm:items-center sm:justify-between" data-testid={`promo-item-${b.id}`}>
+                    <div className="flex min-w-0 items-center gap-3">
                       <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${b.active ? "bg-primary/10" : "bg-muted"}`}>
                         <Gift className={`h-5 w-5 ${b.active ? "text-primary" : "text-muted-foreground"}`} />
                       </div>
