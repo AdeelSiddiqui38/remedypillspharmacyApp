@@ -68,7 +68,14 @@ export async function signInWithGoogle(): Promise<boolean> {
 
   let idToken: string | null = null;
   try {
-    const { result } = await SocialLogin.login({ provider: "google", options: {} });
+    // Scopes are passed explicitly, as the plugin's Android example does.
+    // These are the same two the web redirect flow requests, and they are the
+    // only ones the server needs — it reads the account from the verified ID
+    // token, nothing more.
+    const { result } = await SocialLogin.login({
+      provider: "google",
+      options: { scopes: ["email", "profile"] },
+    });
     // 'online' mode (the default) is the one that returns an ID token.
     if ("idToken" in result) idToken = result.idToken;
   } catch (err: any) {
