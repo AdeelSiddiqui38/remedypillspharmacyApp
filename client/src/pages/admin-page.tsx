@@ -228,19 +228,19 @@ export default function AdminPage() {
   return (
     <div className="min-h-screen bg-[radial-gradient(1200px_circle_at_20%_-10%,hsl(var(--primary)/0.22),transparent_55%),radial-gradient(900px_circle_at_90%_20%,hsl(var(--accent)/0.18),transparent_50%),linear-gradient(to_bottom,hsl(var(--background)),hsl(var(--background)))]">
       <div className="mx-auto max-w-5xl px-4 py-6">
-        <header className="mb-6 flex items-center justify-between">
-          <div className="flex items-center gap-3">
+        <header className="mb-6 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex min-w-0 items-center gap-3">
             <div className="grid h-11 w-11 place-items-center overflow-hidden rounded-2xl bg-white shadow-sm ring-1 ring-border">
               <img src={remedyLogo} alt="Remedy Pills" className="h-full w-full object-contain p-1" />
             </div>
-            <div>
+            <div className="min-w-0">
               <p className="text-xs font-semibold tracking-[0.2em] text-muted-foreground">ADMIN PORTAL</p>
-              <h1 className="text-lg font-semibold tracking-tight" data-testid="text-admin-title">
+              <h1 className="truncate text-lg font-semibold tracking-tight" data-testid="text-admin-title">
                 Remedy Pills Pharmacy
               </h1>
             </div>
           </div>
-          <div className="flex items-center gap-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3">
             <Badge variant="secondary" className="rounded-full" data-testid="badge-admin-role">Admin</Badge>
             <Button
               variant="outline"
@@ -265,7 +265,7 @@ export default function AdminPage() {
           </div>
         </header>
 
-        <div className="mb-6 grid grid-cols-3 gap-3">
+        <div className="mb-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
           <Card className="rounded-2xl border-card-border bg-card/70 backdrop-blur-xl">
             <CardContent className="flex items-center gap-3 p-4">
               <div className="grid h-10 w-10 place-items-center rounded-xl bg-primary/10">
@@ -345,21 +345,24 @@ export default function AdminPage() {
                 </p>
               ) : (
                 filteredPatients.map((p) => (
-                  <div key={p.id} className="flex items-center justify-between gap-3 rounded-2xl border bg-background/60 p-4" data-testid={`admin-patient-${p.id}`}>
-                    <div className="flex items-center gap-3">
+                  <div key={p.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-background/60 p-4" data-testid={`admin-patient-${p.id}`}>
+                    {/* min-w-0 lets this column shrink; without it a long email
+                        keeps the row wider than the screen and the whole page
+                        scrolls sideways on a phone. */}
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
                       <div className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-sm font-bold text-primary">
                         {(p.name || p.username).charAt(0).toUpperCase()}
                       </div>
-                      <div>
-                        <p className="text-sm font-semibold">{p.name || p.username}</p>
-                        <p className="text-xs text-muted-foreground">
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold">{p.name || p.username}</p>
+                        <p className="break-words text-xs text-muted-foreground">
                           {p.email || "No email"}
                           {p.phone && <> &middot; {p.phone}</>}
                           {p.dob && <> &middot; DOB: {p.dob}</>}
                         </p>
                       </div>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex shrink-0 items-center gap-2">
                       {p.phone && (
                         <Badge variant="outline" className="rounded-full text-xs">
                           <Phone className="mr-1 h-3 w-3" /> SMS
@@ -386,7 +389,7 @@ export default function AdminPage() {
 
         {activeTab === "notifications" && (
           <Card className="rounded-3xl border-card-border bg-card/70 shadow-sm backdrop-blur-xl">
-            <CardHeader className="flex flex-row items-center justify-between">
+            <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
               <CardTitle className="text-base">Notifications</CardTitle>
               {unreadNotifications > 0 && (
                 <Button
@@ -527,7 +530,7 @@ export default function AdminPage() {
         {activeTab === "communications" && (
           <div className="space-y-4">
             <Card className="rounded-3xl border-card-border bg-card/70 shadow-sm backdrop-blur-xl">
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
                 <div>
                   <CardTitle className="text-base">Mass SMS / MMS</CardTitle>
                   <p className="mt-1 text-xs text-muted-foreground">Send text messages to all patients with phone numbers. Attach flyers or images.</p>
@@ -551,7 +554,7 @@ export default function AdminPage() {
             </Card>
 
             <Card className="rounded-3xl border-card-border bg-card/70 shadow-sm backdrop-blur-xl">
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
                 <div>
                   <CardTitle className="text-base">Push Notifications</CardTitle>
                   <p className="mt-1 text-xs text-muted-foreground">Broadcast in-app alerts for drug recalls, holiday hours, vaccine availability, and more.</p>
@@ -583,7 +586,7 @@ export default function AdminPage() {
         {activeTab === "offers" && (
           <div className="space-y-4">
             <Card className="rounded-3xl border-card-border bg-card/70 shadow-sm backdrop-blur-xl">
-              <CardHeader className="flex flex-row items-center justify-between">
+              <CardHeader className="flex flex-row flex-wrap items-center justify-between gap-3">
                 <div>
                   <CardTitle className="text-base">Promotional Offers</CardTitle>
                   <p className="mt-1 text-xs text-muted-foreground">Manage the promotional banner shown to patients on the home screen.</p>
@@ -596,19 +599,19 @@ export default function AdminPage() {
                 {promoBanners.length === 0 ? (
                   <p className="text-sm text-muted-foreground">No promotional offers yet. Create one to display on the patient home screen.</p>
                 ) : promoBanners.map((b) => (
-                  <div key={b.id} className="flex items-center justify-between gap-3 rounded-2xl border bg-background/60 p-4" data-testid={`promo-item-${b.id}`}>
-                    <div className="flex items-center gap-3">
+                  <div key={b.id} className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border bg-background/60 p-4" data-testid={`promo-item-${b.id}`}>
+                    <div className="flex min-w-0 flex-1 items-center gap-3">
                       <div className={`grid h-10 w-10 shrink-0 place-items-center rounded-xl ${b.active ? "bg-primary/10" : "bg-muted"}`}>
                         <Gift className={`h-5 w-5 ${b.active ? "text-primary" : "text-muted-foreground"}`} />
                       </div>
-                      <div>
-                        <div className="flex items-center gap-2">
+                      <div className="min-w-0">
+                        <div className="flex flex-wrap items-center gap-2">
                           <p className="text-sm font-semibold">{b.title}</p>
                           <Badge variant={b.active ? "default" : "secondary"} className="rounded-full text-xs">
                             {b.active ? "Active" : "Inactive"}
                           </Badge>
                         </div>
-                        <p className="text-xs text-muted-foreground">{b.description}</p>
+                        <p className="break-words text-xs text-muted-foreground">{b.description}</p>
                       </div>
                     </div>
                     <div className="flex items-center gap-1">
