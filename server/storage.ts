@@ -100,6 +100,15 @@ export const storage = {
     return rows[0] ?? null;
   },
 
+  async getUserByHealthCardNumber(healthCardNumberNormalized: string): Promise<User | null> {
+    const rows = await db
+      .select()
+      .from(schema.users)
+      .where(eq(schema.users.healthCardNumber, healthCardNumberNormalized))
+      .limit(1);
+    return rows[0] ?? null;
+  },
+
   async getUserByProvider(provider: string, providerId: string): Promise<User | null> {
     const rows = await db
       .select()
@@ -461,6 +470,19 @@ export const storage = {
         and(
           eq(schema.krollImportRecords.patientNameNormalized, patientNameNormalized),
           eq(schema.krollImportRecords.dob, dob),
+          isNull(schema.krollImportRecords.claimedByUserId),
+        ),
+      );
+    return rows as any;
+  },
+
+  async getUnclaimedKrollRecordsByHealthCard(healthCardNumberNormalized: string): Promise<KrollImportRecord[]> {
+    const rows = await db
+      .select()
+      .from(schema.krollImportRecords)
+      .where(
+        and(
+          eq(schema.krollImportRecords.healthCardNumberNormalized, healthCardNumberNormalized),
           isNull(schema.krollImportRecords.claimedByUserId),
         ),
       );

@@ -11,6 +11,15 @@ export const users = pgTable("users", {
   email: text("email"),
   phone: text("phone"),
   dob: text("dob"),
+  // The patient's provincial Health Card / Personal Health Number, entered by
+  // the patient themselves (never assigned by the app) to link their account
+  // to their Kroll pharmacy record — see server/kroll.ts. Stored normalized
+  // (digits only). UNIQUE at the database level is the audit control: it is
+  // physically impossible for two patient accounts to hold the same Health
+  // Card Number, so a matched/claimed medication history can never be
+  // attached to more than one login. Nullable — most patients won't set this
+  // until they use the "link my pharmacy record" flow.
+  healthCardNumber: text("health_card_number").unique(),
   role: text("role").notNull().default("patient"),
   provider: text("provider").default("local"),
   providerId: text("provider_id"),
@@ -232,6 +241,12 @@ export const krollImportRecords = pgTable("kroll_import_records", {
   // keeps the original CSV casing for display.
   patientNameNormalized: text("patient_name_normalized").notNull(),
   dob: text("dob").notNull(),
+  // Optional — not every Kroll export includes it, but when present this is
+  // by far the strongest match key (a real unique patient identifier, unlike
+  // name+DOB which can collide). See healthCardNumberNormalized below and
+  // findKrollMatchByHealthCard in server/kroll.ts.
+  healthCardNumber: text("health_card_number"),
+  healthCardNumberNormalized: text("health_card_number_normalized"),
   drugName: text("drug_name").notNull(),
   strength: text("strength"),
   directions: text("directions"),

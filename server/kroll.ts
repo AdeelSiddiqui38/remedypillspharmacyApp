@@ -34,6 +34,24 @@ function normalizeDate(value: string): string {
   return trimmed;
 }
 
+/**
+ * Normalizes a Health Card / Personal Health Number to digits only, so
+ * "123 456 789", "123-456-789" and "123456789" are all treated as the same
+ * card. Canada's provincial PHNs are commonly nine digits (Alberta's
+ * included) with no check digit, but this pharmacy may also serve
+ * out-of-province patients carrying a different format, so length isn't
+ * hard-enforced here — callers that need a user-facing validation message
+ * should use isPlausibleHealthCardNumber below.
+ */
+export function normalizeHealthCardNumber(value: string): string {
+  return value.replace(/\D/g, "");
+}
+
+/** Loose sanity check for a manually-typed Health Card Number, not a real checksum validation. */
+export function isPlausibleHealthCardNumber(normalized: string): boolean {
+  return normalized.length >= 6 && normalized.length <= 12;
+}
+
 function findField(row: Record<string, string>, ...candidates: string[]): string {
   const entries = Object.entries(row);
   for (const candidate of candidates) {
@@ -46,6 +64,7 @@ function findField(row: Record<string, string>, ...candidates: string[]): string
 export interface ParsedKrollRow {
   patientName: string;
   dob: string;
+  healthCardNumber: string;
   drugName: string;
   strength: string;
   directions: string;
@@ -79,6 +98,7 @@ export function parseKrollCsv(buffer: Buffer): ParsedKrollRow[] {
     rows.push({
       patientName,
       dob: normalizeDate(dobRaw),
+      healthCardNumber: findField(record, "healthcard", "healthcarenumber", "personalhealthnumber", "phn", "healthnumber", "hcn", "ahcip"),
       drugName,
       strength: findField(record, "strength", "dose", "dosage"),
       directions: findField(record, "directions", "sig", "instructions"),
@@ -113,6 +133,8 @@ export async function createKrollImportBatch(uploadedByUserId: string, filename:
         patientName: r.patientName,
         patientNameNormalized: normalizeName(r.patientName),
         dob: r.dob,
+        healthCardNumber: r.healthCardNumber || null,
+        healthCardNumberNormalized: r.healthCardNumber ? normalizeHealthCardNumber(r.healthCardNumber) || null : null,
         drugName: r.drugName,
         strength: r.strength || null,
         directions: r.directions || null,
@@ -157,6 +179,31 @@ export async function findKrollMatch(name: string, dob: string): Promise<KrollMa
   if (!normalizedName || !normalizedDob) return null;
 
   const records = await storage.getUnclaimedKrollRecords(normalizedName, normalizedDob);
+  if (records.length === 0) return null;
+
+  return {
+    patientName: records[0].patientName,
+    dob: records[0].dob,
+    medicationCount: records.length,
+    recordIds: records.map((r) => r.id),
+  };
+}
+
+/**
+ * Looks for unclaimed staged records by Health Card / Personal Health
+ * Number — a real unique patient identifier, unlike name+DOB, which can
+ * collide between two different people. This is the strong match path: the
+ * patient types their own card number in (see POST
+ * /api/kroll-match/by-health-card), so a match here is a much higher-
+ * confidence signal than the passive name+DOB banner. Still returns only a
+ * summary, never the medication list itself, so the "Is this you?"
+ * confirmation step in the UI is preserved either way.
+ */
+export async function findKrollMatchByHealthCard(healthCardNumber: string): Promise<KrollMatchCandidate | null> {
+  const normalized = normalizeHealthCardNumber(healthCardNumber || "");
+  if (!isPlausibleHealthCardNumber(normalized)) return null;
+
+  const records = await storage.getUnclaimedKrollRecordsByHealthCard(normalized);
   if (records.length === 0) return null;
 
   return {

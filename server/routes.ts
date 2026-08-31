@@ -9,7 +9,16 @@ import { messagingLimiter } from "./security";
 import { sendTransferEmail, sendAppointmentCancellation } from "./email";
 import { uploadFile } from "./object-storage";
 import { insertCalorieLogSchema } from "@shared/schema";
-import { parseKrollCsv, createKrollImportBatch, findKrollMatch, claimKrollMatch, declineKrollMatch } from "./kroll";
+import {
+  parseKrollCsv,
+  createKrollImportBatch,
+  findKrollMatch,
+  findKrollMatchByHealthCard,
+  claimKrollMatch,
+  declineKrollMatch,
+  normalizeHealthCardNumber,
+  isPlausibleHealthCardNumber,
+} from "./kroll";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -384,13 +393,66 @@ export async function registerRoutes(
 
   // ── Patient: Profile ───────────────────────────────────────
   app.patch("/api/profile", requireAuth, async (req, res) => {
-    const { name, email, phone, dob } = req.body;
-    const data: Record<string, string> = {};
+    const { name, email, phone, dob, healthCardNumber } = req.body;
+    const data: Record<string, any> = {};
     if (name !== undefined) data.name = name;
     if (email !== undefined) data.email = email;
     if (phone !== undefined) data.phone = phone;
     if (dob !== undefined) data.dob = dob;
-    const updated = await storage.updateUser(req.user!.id, data);
+
+    if (healthCardNumber !== undefined) {
+      if (healthCardNumber === null || healthCardNumber === "") {
+        data.healthCardNumber = null;
+      } else {
+        const normalized = normalizeHealthCardNumber(String(healthCardNumber));
+        if (!isPlausibleHealthCardNumber(normalized)) {
+          return res.status(400).json({ message: "That doesn't look like a valid Health Card Number" });
+        }
+        // Audit protocol: no two patient accounts may hold the same Health
+        // Card Number. Checked here for a clear message; the DB's own
+        // UNIQUE constraint on users.healthCardNumber is the backstop below
+        // in case two simultaneous requests both pass this check.
+        const existing = await storage.getUserByHealthCardNumber(normalized);
+        if (existing && existing.id !== req.user!.id) {
+          await storage.createAuditLog({
+            userId: req.user!.id,
+            action: "health_card_conflict_blocked",
+            details: `Patient attempted to link a Health Card Number already linked to another account (conflicting account ${existing.id}).`,
+            ipAddress: req.ip || "unknown",
+            timestamp: new Date().toISOString(),
+          });
+          return res.status(409).json({
+            message: "This Health Care Number is already linked to another account. If you believe this is an error, please contact the pharmacy.",
+          });
+        }
+        data.healthCardNumber = normalized;
+      }
+    }
+
+    let updated;
+    try {
+      updated = await storage.updateUser(req.user!.id, data);
+    } catch (err: any) {
+      if (err?.code === "23505") {
+        return res.status(409).json({
+          message: "This Health Care Number is already linked to another account. If you believe this is an error, please contact the pharmacy.",
+        });
+      }
+      throw err;
+    }
+
+    if (data.healthCardNumber !== undefined) {
+      await storage.createAuditLog({
+        userId: req.user!.id,
+        action: data.healthCardNumber ? "health_card_linked" : "health_card_unlinked",
+        details: data.healthCardNumber
+          ? "Patient linked a Health Card Number to their account."
+          : "Patient removed their linked Health Card Number.",
+        ipAddress: req.ip || "unknown",
+        timestamp: new Date().toISOString(),
+      });
+    }
+
     res.json(sanitizeUser(updated!));
   });
 
@@ -643,18 +705,40 @@ export async function registerRoutes(
     res.json(match);
   });
 
+  // Body, not a query param — a Health Card Number is a sensitive identifier
+  // and shouldn't end up in server access logs or browser history the way a
+  // query string would.
+  app.post("/api/kroll-match/by-health-card", requireAuth, async (req, res) => {
+    const { healthCardNumber } = req.body;
+    if (!healthCardNumber || typeof healthCardNumber !== "string") {
+      return res.status(400).json({ message: "healthCardNumber is required" });
+    }
+    const normalized = normalizeHealthCardNumber(healthCardNumber);
+    if (!isPlausibleHealthCardNumber(normalized)) {
+      return res.status(400).json({ message: "That doesn't look like a valid Health Card Number" });
+    }
+    const match = await findKrollMatchByHealthCard(normalized);
+    res.json(match);
+  });
+
   app.post("/api/kroll-match/claim", requireAuth, async (req, res) => {
     const { recordIds } = req.body;
     if (!Array.isArray(recordIds) || recordIds.length === 0) {
       return res.status(400).json({ message: "recordIds is required" });
     }
-    // Re-derive the match server-side instead of trusting the client's
+    // Re-derive every match server-side instead of trusting the client's
     // record IDs outright — confirms these records really are a match for
-    // the logged-in patient's own name+DOB before copying anything in.
+    // the logged-in patient (by name+DOB, or by their own linked Health
+    // Card Number) before copying anything into their profile.
     const user = req.user!;
-    const match = await findKrollMatch(user.name, user.dob || "");
-    if (!match) return res.status(404).json({ message: "No match found" });
-    const validIds = recordIds.filter((id: string) => match.recordIds.includes(id));
+    const trustedIds = new Set<string>();
+    const nameDobMatch = await findKrollMatch(user.name, user.dob || "");
+    if (nameDobMatch) nameDobMatch.recordIds.forEach((id) => trustedIds.add(id));
+    if (user.healthCardNumber) {
+      const healthCardMatch = await findKrollMatchByHealthCard(user.healthCardNumber);
+      if (healthCardMatch) healthCardMatch.recordIds.forEach((id) => trustedIds.add(id));
+    }
+    const validIds = recordIds.filter((id: string) => trustedIds.has(id));
     if (validIds.length === 0) return res.status(400).json({ message: "This match has expired or already been claimed" });
     const created = await claimKrollMatch(user.id, validIds);
     res.json({ created });

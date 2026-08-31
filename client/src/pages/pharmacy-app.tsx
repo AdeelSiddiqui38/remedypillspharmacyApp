@@ -7,6 +7,7 @@ import { Capacitor } from "@capacitor/core";
 import BiometricSetting from "@/components/biometric-setting";
 import ReminderNotificationsToggle from "@/components/reminder-notifications-toggle";
 import KrollMatchPrompt from "@/components/kroll-match-prompt";
+import HealthCardLink from "@/components/health-card-link";
 import { syncReminderNotifications } from "@/lib/reminder-notifications";
 import { Redirect } from "wouter";
 import { QRCodeSVG } from "qrcode.react";
@@ -2741,6 +2742,8 @@ function AccountTab({
           </form>
         </CardContent>
       </Card>
+
+      <HealthCardLink savedHealthCardNumber={user.healthCardNumber ?? null} />
 
       <FamilyMembersCard />
 
