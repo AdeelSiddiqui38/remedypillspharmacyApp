@@ -12,9 +12,10 @@ Companion to `MACSTORE_DEPLOYMENT.md` (which explains the *why*); this file is t
 | # | Step | Who | Status |
 |---|---|---|---|
 | 0 | D-U-N-S number for Remedy Pills Inc | You | ☑ `24-337-1905` |
-| 1 | Apple Developer Program enrollment **submitted** | You | ☑ ID `MHH8W6VX3X` — awaiting Apple |
-| 1b | Apple verifies signing authority → emails instructions | Apple | ☐ |
-| 1c | Pay US $99 membership | **You** (payment) | ☐ |
+| 1 | Apple Developer Program enrollment **submitted** | You | ☑ ID `MHH8W6VX3X` |
+| 1b | Apple verifies signing authority | Apple | ☑ Confirmed 2026-08-18 — account shows "Remedy Pills Inc (Pending)" |
+| 1c | Pay US $99 membership | **You** (payment) | ☐ In progress — "complete your purchase now" is live on account page. Apple: purchase may take up to 48h to process. |
+| 1d | Accept Apple Developer Program License Agreement | **You** (legal) | ☐ Expect this immediately after payment |
 | 2 | Sign Paid Apps Agreement | **You** (legal) | ☐ |
 | 3 | Native build prep (code, Info.plist) | **Claude — done** | ☑ |
 | 4 | `npm install && npx cap sync ios` | You (your Mac) | ☐ |
@@ -43,16 +44,18 @@ Submitted exactly as accepted by Apple:
 | Work email | info@remedypills.ca |
 | Account Holder | Adeel Siddiqui, +1 (403) 980-7003 |
 
-Apple's message: *"Once we verify your authority to sign legal agreements, we'll email you with instructions on how to complete your enrollment."*
+**Update — 2026-08-18: signing authority verified.** Signed in at `developer.apple.com/account` as `info@remedypills.ca` and confirmed: the account badge reads **"Remedy Pills Inc (Pending)"**, and the page now shows **"Purchase your membership — To continue your enrollment, complete your purchase now."** Apple's own note: *"Your purchase may take up to 48 hours to process."*
 
-**What happens next, in order:**
+⚠️ **Multiple Apple Accounts exist across Adeel's devices** (`a.sid38@hotmail.com`, `honest_787@hotmail.com`, and the correct `info@remedypills.ca`), and Chrome autofill has repeatedly pre-filled the wrong one. Always confirm the signed-in account (top-right avatar) shows **`info@remedypills.ca`** before checking status or paying — signing into a different account looks like "no enrollment found," not an error.
 
-1. Apple verifies your authority to bind Remedy Pills Inc. They frequently **phone the business number on the D&B record** — make sure +1 403-980-7003 is answered, and that whoever answers can confirm Adeel Siddiqui is an owner/officer. This is the single most common cause of delay.
-2. Apple emails **info@remedypills.ca** with instructions. Watch that inbox, including spam.
-3. You then pay the **US $99** membership and accept the **Apple Developer Program License Agreement**.
-4. After that, sign the **Paid Apps Agreement** in App Store Connect → Business — required before the app can be distributed, and before the "iPhone/iPad apps on Apple Silicon Macs" toggle takes effect.
+**What's left, in order:**
 
-Typical timeline is a few days to two weeks. If nothing arrives in ~10 business days, contact Apple with the Enrollment ID above.
+1. **Pay the US $99 membership** — click "complete your purchase now" on the account page. This is a real payment; not something Claude can do.
+2. Wait up to 48 hours for it to process.
+3. **Accept the Apple Developer Program License Agreement** — expect this prompt right after payment clears.
+4. **Sign the Paid Apps Agreement** in App Store Connect → Business — required before the app can be distributed, and before the "iPhone/iPad apps on Apple Silicon Macs" toggle takes effect.
+
+Once all four are done, `developer.apple.com/account` should show full membership (no "Pending"), and Xcode will offer "Remedy Pills Inc" as a signing Team.
 
 ## 0b. Company / enrollment details
 
