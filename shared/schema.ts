@@ -198,3 +198,49 @@ export const session = pgTable("session", {
 
 export const insertSessionSchema = createInsertSchema(session);
 export type SessionRow = typeof session.$inferSelect;
+
+// ── Kroll CSV staging import ────────────────────────────────────────────
+// Staff periodically export a patient/medication CSV from Kroll (the
+// pharmacy's TELUS Health system of record) and upload it via
+// /api/admin/kroll-import. Rows land here — a holding table — NOT in a
+// patient's live prescriptions, so nothing is visible to anyone until the
+// matching patient is shown the match and explicitly confirms it's them
+// (see findKrollMatch/claimKrollMatch in server/kroll.ts). Unclaimed rows
+// auto-expire (server/kroll.ts sweep) so the app's internet-facing database
+// never holds a standing copy of the whole Kroll patient roster — patients
+// who never install the app should not have their medication history
+// sitting here indefinitely. This matters under Alberta's Health
+// Information Act, which still applies to data in staging.
+export const krollImportBatches = pgTable("kroll_import_batches", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  uploadedByUserId: varchar("uploaded_by_user_id").notNull(),
+  filename: text("filename").notNull(),
+  rowCount: integer("row_count").notNull().default(0),
+  createdAt: text("created_at").notNull(),
+  expiresAt: text("expires_at").notNull(),
+});
+
+export const insertKrollImportBatchSchema = createInsertSchema(krollImportBatches).omit({ id: true });
+export type InsertKrollImportBatch = z.infer<typeof insertKrollImportBatchSchema>;
+export type KrollImportBatch = typeof krollImportBatches.$inferSelect;
+
+export const krollImportRecords = pgTable("kroll_import_records", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  batchId: varchar("batch_id").notNull(),
+  patientName: text("patient_name").notNull(),
+  // Lowercased/whitespace-collapsed copy used for matching; patientName
+  // keeps the original CSV casing for display.
+  patientNameNormalized: text("patient_name_normalized").notNull(),
+  dob: text("dob").notNull(),
+  drugName: text("drug_name").notNull(),
+  strength: text("strength"),
+  directions: text("directions"),
+  rxNumber: text("rx_number"),
+  lastFillDate: text("last_fill_date"),
+  claimedByUserId: varchar("claimed_by_user_id"),
+  claimedAt: text("claimed_at"),
+});
+
+export const insertKrollImportRecordSchema = createInsertSchema(krollImportRecords).omit({ id: true });
+export type InsertKrollImportRecord = z.infer<typeof insertKrollImportRecordSchema>;
+export type KrollImportRecord = typeof krollImportRecords.$inferSelect;

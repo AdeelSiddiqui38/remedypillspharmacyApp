@@ -25,12 +25,13 @@ import {
   Plus,
   Send,
   Trash2,
+  Upload,
   Users,
   X,
 } from "lucide-react";
 import remedyLogo from "@assets/Remedypills_logo_1_1771941028931.png";
 
-type AdminTab = "patients" | "messages" | "communications" | "offers" | "notifications";
+type AdminTab = "patients" | "messages" | "communications" | "offers" | "notifications" | "kroll";
 
 interface AdminNotification {
   id: string;
@@ -209,6 +210,41 @@ export default function AdminPage() {
     onSuccess: () => qc.invalidateQueries({ queryKey: ["/api/admin/promo-banners"] }),
   });
 
+  // ── Kroll CSV Import ────────────────────────────────────────
+  // Staff upload a Kroll medication export here; rows are staged and only
+  // become a live prescription once the matching patient confirms it's
+  // them (see KrollMatchPrompt on the patient side). Batches auto-expire
+  // if unclaimed, so this list also doubles as "what's still pending."
+  interface KrollBatch { id: string; filename: string; rowCount: number; createdAt: string; expiresAt: string; total: number; claimed: number; }
+  const { data: krollBatches = [] } = useQuery<KrollBatch[]>({ queryKey: ["/api/admin/kroll-import"], enabled: activeTab === "kroll", staleTime: 15_000 });
+  const [krollUploading, setKrollUploading] = useState(false);
+  const [krollUploadError, setKrollUploadError] = useState<string | null>(null);
+
+  const handleKrollFileSelect = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setKrollUploading(true);
+    setKrollUploadError(null);
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+      const res = await fetch("/api/admin/kroll-import", { method: "POST", body: formData, credentials: "include" });
+      const body = await res.json().catch(() => ({}));
+      if (!res.ok) throw new Error(body.message || "Upload failed");
+      qc.invalidateQueries({ queryKey: ["/api/admin/kroll-import"] });
+    } catch (err: any) {
+      setKrollUploadError(err.message || "Upload failed");
+    } finally {
+      setKrollUploading(false);
+    }
+  };
+
+  const deleteKrollBatchMutation = useMutation({
+    mutationFn: async (id: string) => { await apiRequest("DELETE", `/api/admin/kroll-import/${id}`); },
+    onSuccess: () => qc.invalidateQueries({ queryKey: ["/api/admin/kroll-import"] }),
+  });
+
   const messagesByUser = allMessages.reduce<Record<string, Message[]>>((acc, m) => {
     if (!acc[m.userId]) acc[m.userId] = [];
     acc[m.userId].push(m);
@@ -223,6 +259,7 @@ export default function AdminPage() {
     { id: "messages", label: "Messages", icon: <MessageCircle className="h-4 w-4" />, count: unreadConversations },
     { id: "communications", label: "Communications", icon: <Send className="h-4 w-4" /> },
     { id: "offers", label: "Offers", icon: <Gift className="h-4 w-4" />, count: promoBanners.length },
+    { id: "kroll", label: "Kroll Import", icon: <Upload className="h-4 w-4" /> },
   ];
 
   return (
@@ -646,6 +683,81 @@ export default function AdminPage() {
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
+                  </div>
+                ))}
+              </CardContent>
+            </Card>
+          </div>
+        )}
+
+        {activeTab === "kroll" && (
+          <div className="space-y-4">
+            <Card className="rounded-3xl border-card-border bg-card/70 shadow-sm backdrop-blur-xl">
+              <CardHeader className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <CardTitle className="text-base">Kroll CSV Import</CardTitle>
+                  <p className="mt-1 text-xs text-muted-foreground">
+                    Upload a Kroll "Rx for Drug/Doctor Groups" CSV export (Rx menu → Rx for Drug/Doctor Groups → Save CSV).
+                    Rows are staged, not live — a patient only gets these medications once they sign in and confirm the match
+                    is them. Upload small batches for the patients you're actively onboarding; unclaimed batches expire
+                    automatically after about 75 days.
+                  </p>
+                </div>
+                <div>
+                  <input
+                    type="file"
+                    accept=".csv,text/csv"
+                    onChange={handleKrollFileSelect}
+                    className="hidden"
+                    id="kroll-file-input"
+                    data-testid="input-kroll-file"
+                  />
+                  <label htmlFor="kroll-file-input">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="rounded-2xl"
+                      size="sm"
+                      disabled={krollUploading}
+                      onClick={() => document.getElementById("kroll-file-input")?.click()}
+                      data-testid="button-kroll-upload"
+                    >
+                      <Upload className="mr-2 h-4 w-4" />
+                      {krollUploading ? "Uploading…" : "Upload CSV"}
+                    </Button>
+                  </label>
+                </div>
+              </CardHeader>
+              <CardContent className="space-y-3">
+                {krollUploadError && (
+                  <p className="rounded-xl bg-destructive/10 p-3 text-xs text-destructive" data-testid="text-kroll-upload-error">
+                    {krollUploadError}
+                  </p>
+                )}
+                {krollBatches.length === 0 ? (
+                  <p className="text-sm text-muted-foreground">No Kroll batches uploaded yet.</p>
+                ) : krollBatches.map((b) => (
+                  <div
+                    key={b.id}
+                    className="flex flex-col gap-3 rounded-2xl border bg-background/60 p-4 sm:flex-row sm:items-center sm:justify-between"
+                    data-testid={`kroll-batch-${b.id}`}
+                  >
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold">{b.filename}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {b.claimed} of {b.total} medication row(s) claimed · uploaded {new Date(b.createdAt).toLocaleDateString("en-CA")} · expires{" "}
+                        {new Date(b.expiresAt).toLocaleDateString("en-CA")}
+                      </p>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="rounded-xl text-destructive hover:text-destructive"
+                      onClick={() => deleteKrollBatchMutation.mutate(b.id)}
+                      data-testid={`button-delete-kroll-batch-${b.id}`}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
                   </div>
                 ))}
               </CardContent>

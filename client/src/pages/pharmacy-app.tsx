@@ -6,6 +6,7 @@ import { useToast, toast } from "@/hooks/use-toast";
 import { Capacitor } from "@capacitor/core";
 import BiometricSetting from "@/components/biometric-setting";
 import ReminderNotificationsToggle from "@/components/reminder-notifications-toggle";
+import KrollMatchPrompt from "@/components/kroll-match-prompt";
 import { syncReminderNotifications } from "@/lib/reminder-notifications";
 import { Redirect } from "wouter";
 import { QRCodeSVG } from "qrcode.react";
@@ -775,6 +776,8 @@ export default function PharmacyApp() {
         userName={displayName}
         unreadCount={unreadNotifications.length}
       />
+
+      <KrollMatchPrompt />
 
       <main className="px-4 pb-24 pt-5">
         {activeTab === "home" && (

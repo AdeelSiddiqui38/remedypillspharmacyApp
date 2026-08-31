@@ -6,6 +6,7 @@ import { serveStatic } from "./static";
 import { createServer } from "http";
 import { seedAdminUser } from "./seed-admin";
 import { startRetentionSweepSchedule } from "./retention";
+import { startKrollSweepSchedule } from "./kroll";
 import fs from "fs";
 import path from "path";
 
@@ -87,6 +88,7 @@ app.use((req, res, next) => {
   await registerRoutes(httpServer, app);
   await seedAdminUser();
   startRetentionSweepSchedule();
+  startKrollSweepSchedule();
 
   app.use((err: any, _req: Request, res: Response, next: NextFunction) => {
     const status = err.status || err.statusCode || 500;

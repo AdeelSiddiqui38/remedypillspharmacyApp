@@ -9,6 +9,7 @@ import { messagingLimiter } from "./security";
 import { sendTransferEmail, sendAppointmentCancellation } from "./email";
 import { uploadFile } from "./object-storage";
 import { insertCalorieLogSchema } from "@shared/schema";
+import { parseKrollCsv, createKrollImportBatch, findKrollMatch, claimKrollMatch, declineKrollMatch } from "./kroll";
 
 const upload = multer({
   storage: multer.memoryStorage(),
@@ -22,6 +23,23 @@ const upload = multer({
       cb(null, true);
     } else {
       cb(new Error("Only images (JPEG, PNG, GIF, WebP) and PDF files are allowed"));
+    }
+  },
+});
+
+const uploadCsv = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: 10 * 1024 * 1024 },
+  fileFilter: (_req, file, cb) => {
+    // Browsers/OSes report CSV under several different mimetypes, so also
+    // accept anything with a .csv extension rather than relying on mimetype
+    // alone.
+    const okMime = ["text/csv", "application/vnd.ms-excel", "application/csv", "text/plain"].includes(file.mimetype);
+    const okExt = file.originalname.toLowerCase().endsWith(".csv");
+    if (okMime || okExt) {
+      cb(null, true);
+    } else {
+      cb(new Error("Only CSV files are allowed"));
     }
   },
 });
@@ -573,6 +591,79 @@ export async function registerRoutes(
   app.get("/api/admin/audit-logs", requireAdmin, async (_req, res) => {
     const logs = await storage.getAllAuditLogs();
     res.json(logs);
+  });
+
+  // ── Admin: Kroll CSV Import (staging) ──────────────────────
+  // Staff upload a Kroll "Rx for Drug/Doctor Groups" CSV export here. Rows
+  // land in a holding table (server/kroll.ts) — nothing becomes a live
+  // prescription until the matching patient confirms it's them via
+  // POST /api/kroll-match/claim below. Unclaimed rows auto-expire.
+  app.post("/api/admin/kroll-import", requireAdmin, uploadCsv.single("file"), async (req, res) => {
+    if (!req.file) return res.status(400).json({ message: "No CSV file uploaded" });
+    try {
+      const rows = parseKrollCsv(req.file.buffer);
+      if (rows.length === 0) {
+        return res.status(400).json({
+          message: "No usable rows found. Each row needs at least a patient name, date of birth, and drug name — check the CSV's column headers.",
+        });
+      }
+      const batch = await createKrollImportBatch(req.user!.id, req.file.originalname, rows);
+      res.status(201).json(batch);
+    } catch (err: any) {
+      console.error("Kroll CSV import error:", err);
+      res.status(400).json({ message: err.message || "Could not parse this CSV file" });
+    }
+  });
+
+  app.get("/api/admin/kroll-import", requireAdmin, async (_req, res) => {
+    const batches = await storage.getAllKrollImportBatches();
+    const withStats = await Promise.all(
+      batches.map(async (b: any) => ({ ...b, ...(await storage.getKrollBatchClaimStats(b.id)) })),
+    );
+    res.json(withStats);
+  });
+
+  app.delete("/api/admin/kroll-import/:id", requireAdmin, async (req, res) => {
+    await storage.deleteKrollBatch(req.params.id);
+    await storage.createAuditLog({
+      userId: req.user!.id,
+      action: "kroll_import_deleted",
+      details: `Admin manually deleted Kroll import batch ${req.params.id}`,
+      ipAddress: req.ip || "unknown",
+      timestamp: new Date().toISOString(),
+    });
+    res.json({ success: true });
+  });
+
+  // ── Patient: Kroll Match (confirm-before-populate auto-fill) ──
+  app.get("/api/kroll-match", requireAuth, async (req, res) => {
+    const user = req.user!;
+    if (!user.name || !user.dob) return res.json(null);
+    const match = await findKrollMatch(user.name, user.dob);
+    res.json(match);
+  });
+
+  app.post("/api/kroll-match/claim", requireAuth, async (req, res) => {
+    const { recordIds } = req.body;
+    if (!Array.isArray(recordIds) || recordIds.length === 0) {
+      return res.status(400).json({ message: "recordIds is required" });
+    }
+    // Re-derive the match server-side instead of trusting the client's
+    // record IDs outright — confirms these records really are a match for
+    // the logged-in patient's own name+DOB before copying anything in.
+    const user = req.user!;
+    const match = await findKrollMatch(user.name, user.dob || "");
+    if (!match) return res.status(404).json({ message: "No match found" });
+    const validIds = recordIds.filter((id: string) => match.recordIds.includes(id));
+    if (validIds.length === 0) return res.status(400).json({ message: "This match has expired or already been claimed" });
+    const created = await claimKrollMatch(user.id, validIds);
+    res.json({ created });
+  });
+
+  app.post("/api/kroll-match/decline", requireAuth, async (req, res) => {
+    const { recordIds } = req.body;
+    await declineKrollMatch(req.user!.id, Array.isArray(recordIds) ? recordIds : []);
+    res.json({ success: true });
   });
 
   app.get("/api/promo-banner", async (_req, res) => {

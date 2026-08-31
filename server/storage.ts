@@ -3,7 +3,7 @@ import pg from "pg";
 import session from "express-session";
 import connectPg from "connect-pg-simple";
 import { drizzle } from "drizzle-orm/node-postgres";
-import { eq, and, sql } from "drizzle-orm";
+import { eq, and, sql, inArray, lt, isNull } from "drizzle-orm";
 
 import * as schema from "../shared/schema";
 import type {
@@ -18,6 +18,8 @@ import type {
   CalorieLog,
   PromoBanner,
   AuditLog,
+  KrollImportBatch,
+  KrollImportRecord,
 } from "../shared/schema";
 
 const { Pool } = pg;
@@ -438,5 +440,84 @@ export const storage = {
   async deleteAllCalorieLogsByUser(userId: string) {
     await db.delete(schema.calorieLogs).where(eq(schema.calorieLogs.userId, userId));
     return true;
+  },
+
+  // -------- Kroll CSV Import (staging) --------
+  async createKrollImportBatch(data: any): Promise<KrollImportBatch> {
+    const rows = await db.insert(schema.krollImportBatches).values(data).returning();
+    return rows[0] as any;
+  },
+
+  async createKrollImportRecords(data: any[]) {
+    if (data.length === 0) return [];
+    return db.insert(schema.krollImportRecords).values(data).returning();
+  },
+
+  async getUnclaimedKrollRecords(patientNameNormalized: string, dob: string): Promise<KrollImportRecord[]> {
+    const rows = await db
+      .select()
+      .from(schema.krollImportRecords)
+      .where(
+        and(
+          eq(schema.krollImportRecords.patientNameNormalized, patientNameNormalized),
+          eq(schema.krollImportRecords.dob, dob),
+          isNull(schema.krollImportRecords.claimedByUserId),
+        ),
+      );
+    return rows as any;
+  },
+
+  async getKrollRecordsByIds(ids: string[]): Promise<KrollImportRecord[]> {
+    if (ids.length === 0) return [];
+    const rows = await db.select().from(schema.krollImportRecords).where(inArray(schema.krollImportRecords.id, ids));
+    return rows as any;
+  },
+
+  async markKrollRecordsClaimed(ids: string[], userId: string, claimedAt: string) {
+    if (ids.length === 0) return true;
+    await db
+      .update(schema.krollImportRecords)
+      .set({ claimedByUserId: userId, claimedAt })
+      .where(inArray(schema.krollImportRecords.id, ids));
+    return true;
+  },
+
+  async getAllKrollImportBatches(): Promise<KrollImportBatch[]> {
+    const rows = await db.select().from(schema.krollImportBatches).orderBy(sql`created_at DESC`);
+    return rows as any;
+  },
+
+  async getKrollBatchClaimStats(batchId: string): Promise<{ total: number; claimed: number }> {
+    const rows = await db.select().from(schema.krollImportRecords).where(eq(schema.krollImportRecords.batchId, batchId));
+    return { total: rows.length, claimed: rows.filter((r: any) => !!r.claimedByUserId).length };
+  },
+
+  async deleteKrollBatch(id: string) {
+    await db.delete(schema.krollImportRecords).where(eq(schema.krollImportRecords.batchId, id));
+    await db.delete(schema.krollImportBatches).where(eq(schema.krollImportBatches.id, id));
+    return true;
+  },
+
+  // Deletes every batch (and its records) whose expiresAt has passed. Run
+  // daily by startKrollSweepSchedule() in server/kroll.ts — the mechanism
+  // that keeps staged Kroll data from becoming a permanent shadow copy of
+  // the pharmacy's full patient roster.
+  async deleteExpiredKrollBatches(nowIso: string): Promise<{ batches: number; records: number }> {
+    const expired = await db
+      .select()
+      .from(schema.krollImportBatches)
+      .where(lt(schema.krollImportBatches.expiresAt, nowIso));
+    let recordCount = 0;
+    for (const batch of expired) {
+      const recs = await db
+        .delete(schema.krollImportRecords)
+        .where(eq(schema.krollImportRecords.batchId, batch.id))
+        .returning();
+      recordCount += recs.length;
+    }
+    if (expired.length > 0) {
+      await db.delete(schema.krollImportBatches).where(lt(schema.krollImportBatches.expiresAt, nowIso));
+    }
+    return { batches: expired.length, records: recordCount };
   },
 };
