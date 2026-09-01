@@ -103,7 +103,9 @@ export default function PrivacyPage() {
                 from you. Where your health information is concerned, we take steps to send only the minimum
                 information necessary in SMS and email messages — full prescription, appointment, and health
                 details are only ever shown after you log in to the secure patient portal. Our pharmacy records
-                are stored within Canada, consistent with Alberta College of Pharmacy requirements.
+                are currently hosted with a cloud infrastructure provider located outside of Canada. We remain
+                fully responsible for this information regardless of where it is hosted, require our hosting
+                provider to protect it accordingly, and are working to store pharmacy records within Canada.
               </p>
             </section>
 
