@@ -38,9 +38,10 @@ with Railway (see Section C.6).
 
 **✅ Finalized as a standalone, signable file:** `store-listing/Remedy_Pills_PIA_Cover_Letter.docx`,
 built on the official Remedy Pills Pharmacy letterhead (`branding/Remedy_Pills_Letterhead.docx`,
-logo + address/contact masthead and footer). Signer: Adeel Siddiqui, Proprietor. Only the
-`[DATE]` field remains to be filled in — with the actual submission date — before signing and
-sending to pia@oipc.ab.ca. The text below is kept for reference/history; edit the .docx directly
+logo + address/contact masthead and footer). **Co-signed by both Adeel Siddiqui (Proprietor) and
+Nayel Anwer (Pharmacy Manager / Privacy Officer)** — each has their own signature line. Only the
+`[DATE]` field remains to be filled in — with the actual submission date — before both sign and
+it is sent to pia@oipc.ab.ca. The text below is kept for reference/history; edit the .docx directly
 for the copy that actually gets sent.
 
 > Office of the Information and Privacy Commissioner of Alberta
@@ -74,8 +75,10 @@ for the copy that actually gets sent.
 > review.
 >
 > Sincerely,
-> Adeel Siddiqui, Proprietor
-> Remedy Pills Pharmacy
+>
+> Adeel Siddiqui, Proprietor — Remedy Pills Pharmacy
+>
+> Nayel Anwer, Pharmacy Manager / Privacy Officer — Remedy Pills Pharmacy
 
 ---
 
@@ -85,10 +88,10 @@ for the copy that actually gets sent.
 |---|---|
 | **Official Project Name** | Remedy Pills Pharmacy Patient Portal (mobile app + web application) |
 | **Other names used** | "RemedyPills," `ca.remedypills.app` |
-| **Legal Name of Custodian** | [CONFIRM — likely "Remedy Pills Inc.," operating as Remedy Pills Pharmacy, per store-listing docs; confirm exact registered legal name] |
-| **Person completing this PIA (OIPC's primary contact)** | [NAME, TITLE, PHONE, EMAIL] |
-| **Person responsible for HIA compliance ("responsible affiliate" — HIA s.62)** | Nayel Anwer, Pharmacy Manager — remedypillspharmacy@gmail.com, +1 403-980-7003 *(currently listed as Privacy Officer in the app's own privacy policy; confirm this is the correct designation)* |
-| **PIA submission date** | [DATE] |
+| **Legal Name of Custodian** | "Remedy Pills Inc.," operating as Remedy Pills Pharmacy |
+| **Person completing this PIA (OIPC's primary contact)** | Adeel Siddiqui, Proprietor — 403-390-2634; remedypillspharmacy@gmail.com |
+| **Person responsible for HIA compliance ("responsible affiliate" — HIA s.62)** | Nayel Anwer, Pharmacy Manager / Privacy Officer — remedypillspharmacy@gmail.com, +1 403-980-7003 |
+| **PIA submission date** | [DATE — September 2026] |
 | **Expected/actual implementation date** | **Not yet in live operation.** The App is currently in testing only, with no patient data. Go-live date is to be determined, following the OIPC's review of this PIA. The Kroll import feature is built but has not been connected to Kroll or run against any real data. |
 | **OIPC file references for related prior PIAs** | None on file. |
 
@@ -108,7 +111,7 @@ patients of Remedy Pills Pharmacy (Calgary, Alberta):
 - Set personal medication reminders
 - Book and manage pharmacy service appointments (consultations, injections, medication
   reviews)
-- Exchange secure messages with pharmacy staff
+- Exchange secure messages with the pharmacy (currently handled exclusively by the Pharmacy Manager, Nayel Anwer)
 - Log personal health measurements and food/calorie intake
 - Manage family members' prescriptions where they hold caregiver authority
 - Submit a prescription transfer request from another pharmacy
@@ -168,22 +171,49 @@ is theirs.
 
 ## SECTION B — ORGANIZATIONAL PRIVACY MANAGEMENT
 
-**1. Management structure — `[PHARMACY TO COMPLETE]`**
+**1. Management structure**
 
-*Describe who is accountable for privacy decisions (e.g. the Pharmacy Manager/Privacy
-Officer), whether there is a privacy committee, and how privacy issues are escalated. The
-App's own privacy policy currently names Nayel Anwer, Pharmacy Manager, as the designated
-Privacy Officer — confirm this is accurate and describe reporting lines.*
+Remedy Pills Pharmacy is a locally owned and operated community pharmacy. The Pharmacy
+Manager is responsible for the day-to-day management of privacy and the protection of
+personal and health information collected, used, maintained, and disclosed by the pharmacy.
+Nayel Anwer, Pharmacy Manager, is designated as the **Privacy Officer** and is accountable
+for privacy-related decisions, including responding to privacy inquiries and complaints,
+overseeing compliance with applicable privacy legislation and professional requirements,
+managing privacy incidents, and coordinating with the pharmacy owner on material issues.
 
-**2. Policy management — `[PHARMACY TO COMPLETE]`**
+As a small community pharmacy, Remedy Pills Pharmacy does not maintain a separate privacy
+committee. Privacy matters are managed through the Pharmacy Manager/Privacy Officer, with
+significant privacy incidents, compliance concerns, or matters requiring business-level
+decisions escalated to the pharmacy owner. Where third-party service providers, technology
+vendors, or application providers are involved in processing personal information, the
+Pharmacy Manager is responsible for ensuring that appropriate privacy and contractual
+requirements are considered. Full detail: **Appendix E-1 §2 (Privacy Accountability)**.
 
-*How are privacy policies developed, approved, communicated, and reviewed? See Section E:
-several of the required written policies do not yet appear to exist as standalone
-documents and will need to be created (see checklist at the end of this document).*
+**2. Policy management**
 
-**3. Training and awareness — `[PHARMACY TO COMPLETE]`**
+Remedy Pills Pharmacy is responsible for establishing and maintaining privacy policies and
+procedures appropriate to the operations of a community pharmacy and the sensitivity of the
+personal and health information handled by the organization. Policies are developed based
+on applicable Alberta privacy and health-information requirements, pharmacy regulatory
+obligations, operational requirements, and identified privacy risks, and are communicated to
+staff during onboarding and through ongoing training and updates when requirements change.
+Policies are reviewed at least annually, and additionally whenever there is a significant
+change to legislation, operations, technology, vendors, or identified risks. Full detail,
+including the complete set of written policies: **Appendix E-1** (the *Privacy & Information
+Security Policy Manual*, attached at Section E of this PIA).
 
-*What privacy training do pharmacy staff and administrators receive, and how often?*
+**3. Training and awareness**
+
+Remedy Pills Pharmacy recognizes that privacy protection is a shared responsibility among all
+pharmacy staff, administrators, contractors, and other individuals who may have access to
+personal or health information. Privacy and confidentiality requirements are addressed during
+staff onboarding and orientation, covering (as applicable) protection of patient information,
+collection/use/disclosure rules, secure handling of records and communications, appropriate
+system access, password/account security, privacy considerations for electronic
+communications, identifying and reporting suspected incidents, responding to patient privacy
+inquiries, and confidentiality obligations toward third-party providers. The Pharmacy
+Manager/Privacy Officer oversees training and ensures refresher training is provided at least
+annually. Full detail: **Appendix E-1 §5 (Training, Awareness & Sanctions)**.
 
 **4. Incident response**
 
@@ -191,10 +221,10 @@ Partially implemented in the system itself: every sensitive action (Health Card 
 linked/unlinked, a linking conflict blocked, Kroll data uploaded/deleted, a Kroll match
 claimed or declined, an account password changed, an account deleted, admin actions on
 patient records) is written to an append-only audit log (`audit_logs` table) with the
-acting user, action, detail, timestamp, and IP address. **What is not yet documented:** a
-written incident-response *policy* describing who is notified, decision criteria for
-notifying affected patients or the OIPC, and post-incident review. `[PHARMACY TO COMPLETE
-— this policy must be written; see Section E]`.
+acting user, action, detail, timestamp, and IP address. The written incident-response
+*policy* — who is notified, decision criteria for notifying affected patients or the OIPC,
+containment, evidence preservation, and post-incident review — is now documented in
+**Appendix E-1 §19 (Incident Response)**, attached at Section E of this PIA.
 
 **5. Access and correction requests**
 
@@ -203,9 +233,10 @@ Patients can view their own health information at any time by logging into the A
 patient can only query their own records; see Section D.1). Patients can update their own
 name, email, phone, date of birth, and Health Card Number directly (`PATCH /api/profile`).
 Corrections to clinical data itself (e.g. a prescription's directions) are made by pharmacy
-staff through the admin console. `[PHARMACY TO COMPLETE — describe the process/timeframe
-for a patient who requests a correction pharmacy staff need to action, e.g. via a message
-or phone call to the pharmacy.]`
+staff through the admin console. The formal process and timeframe for handling patient access
+and correction requests — including identity verification, response timelines, and
+documentation — is set out in **Appendix E-1 §3 (Access to Health Information) and §4
+(Correction Requests)**.
 
 ---
 
@@ -231,29 +262,11 @@ or phone call to the pharmacy.]`
 
 ### C.2 Information Flow Analysis
 
-**Component 1 — Information Flow Diagram (description; a visual diagram should be produced
-for the formal submission)**
+**Component 1 — Information Flow Diagram**
 
-```
-                    ┌─────────────────────┐
-   Patient  ───1───▶│                     │
-   (registration,    │                     │
-    profile, logs,   │                     │
-    messages)        │   Remedy Pills App  │
-                     │   (Railway, US West)│
-   Pharmacy Staff ──2▶│                     │
-   (Kroll CSV export,│                     │
-    messages, admin  │                     │
-    actions)         └──────────┬──────────┘
-                                 │
-                    ┌────────────┼────────────┬─────────────┬──────────────┐
-                    ▼            ▼            ▼             ▼              ▼
-                 Flow 3       Flow 4       Flow 5        Flow 6         Flow 7
-                (Google      (Twilio SMS  (Gmail/       (DigitalOcean  (back to
-                 OAuth —      — appt/     nodemailer    Spaces —       patient,
-                 auth only)   refill      — transactional attachment    on login)
-                              alerts)      email)        storage)
-```
+![Information Flow Diagram — Remedy Pills Pharmacy Patient Portal](assets/info_flow_diagram.png)
+
+*Flows 1–8 in the diagram above correspond exactly to the numbered rows in Component 2 below.*
 
 **Component 2 — Purposes and Legal Authority**
 
@@ -324,21 +337,20 @@ Section D.2 for the full risk/mitigation entry.
 
 | Vendor | Role | Data it can access | Information Manager Agreement (HIA s.66) on file? |
 |---|---|---|---|
-| **Railway** | Application hosting, PostgreSQL database (all patient/health data at rest) | Full database access as the underlying infrastructure provider | `[TO CONFIRM — likely NOT in place; see action item below]` |
-| **Google** | OAuth authentication; Google Play distribution | Name, email (auth only) — no health information | `[TO CONFIRM]` — likely governed by Google's standard terms, not a custom IMA; confirm whether that is sufficient |
-| **Twilio** | SMS delivery | Phone number, message text (minimized — no drug names) | `[TO CONFIRM]` |
-| **Google (Gmail/nodemailer)** | Transactional email | Email address, message content | `[TO CONFIRM]` |
-| **DigitalOcean** | Object storage for uploaded attachments | Uploaded files (may include prescription images) | `[TO CONFIRM]` |
-| **TELUS Health (Kroll)** | Pharmacy's dispensing system of record; source of the CSV exports staff upload | N/A — Kroll does not receive data *from* the App; the App only imports from Kroll | Not an information manager *for this project* (Kroll is the pharmacy's own separate system); confirm the pharmacy's existing Kroll license permits this export/reuse |
+| **Railway** | Application hosting, PostgreSQL database (all patient/health data at rest) | Full database access as the underlying infrastructure provider | Not currently in place. If the OIPC's review of this PIA determines a written IMA is required, the pharmacy will initiate one with Railway before connecting real patient data. |
+| **Google** | OAuth authentication; Google Play distribution | Name, email (auth only) — no health information | Governed by Google's standard terms, not a custom IMA — no health information is in this flow. |
+| **Twilio** | SMS delivery | Phone number, message text (minimized — no drug names) | TBA |
+| **Google (Gmail/nodemailer)** | Transactional email | Email address, message content | TBA |
+| **DigitalOcean** | Object storage for uploaded attachments | Uploaded files (may include prescription images) | Not currently in place. Same position as Railway: to be initiated if required, before connecting real patient data. |
+| **TELUS Health (Kroll)** | Pharmacy's dispensing system of record; source of the CSV exports staff upload | N/A — Kroll does not receive data *from* the App; the App only imports from Kroll | Not an information manager *for this project* — Kroll is the pharmacy's own separate system. |
 
-**Action item:** none of these vendor relationships appear to have a written HIA-compliant
-Information Manager Agreement in place, as best determined from the codebase and available
-documentation. Per HIA s.66, a custodian using a third party to store, process, retrieve, or
-dispose of health information on its behalf must have a written agreement meeting specific
-statutory content requirements (objectives, whether the manager may collect/use/disclose
-further, access-request handling, etc.). **This should be put in place — at minimum with
-Railway, which holds the entire database — before or shortly after this PIA is submitted.**
-`[PHARMACY TO ACTION]`
+**Open item:** written Information Manager Agreements are not yet confirmed in place with
+Railway or DigitalOcean — the two vendors that hold patient data at rest. This is the
+pharmacy's position pending the OIPC's review: rather than assuming an IMA is required,
+Remedy Pills Pharmacy will initiate one with the relevant vendor(s) if the review determines
+it is needed, and will do so before any real patient data is connected. Google, Twilio, and
+Gmail flows carry no health information and are lower risk (see table above). See also
+Appendix E-1 §10 (Third Parties & Information Managers).
 
 ### C.7 Use of Health Information Outside Alberta
 
@@ -394,8 +406,8 @@ or uses of health information outside Alberta."
 
 | Position / Role | Number of staff in role | Type of access | Description of information this role can access |
 |---|---|---|---|
-| Patient | [PHARMACY: current registered count] | Read/write, own records only | Own registration data, prescriptions, appointments, messages, health logs, Health Card Number. Enforced server-side: every patient-facing query and mutation is scoped to `req.user!.id`; a patient cannot query another patient's records by guessing an ID. |
-| Admin (pharmacist/pharmacy manager) | `[PHARMACY TO COMPLETE — number of staff with admin role]` | Read/write, all patients | Full read/write access to all patient records, messaging, Kroll CSV upload, broadcast notifications/SMS, promotional content, audit log. Gated by `requireAdmin` middleware — checked server-side on every admin route, not just hidden in the UI. |
+| Patient | 1 *(an internal test account created during development — not a registered patient; consistent with the status notice at the top of this PIA that no real patient data exists in the App)* | Read/write, own records only | Own registration data, prescriptions, appointments, messages, health logs, Health Card Number. Enforced server-side: every patient-facing query and mutation is scoped to `req.user!.id`; a patient cannot query another patient's records by guessing an ID. |
+| Admin (pharmacist/pharmacy manager) | 1 — the Pharmacy Manager (Nayel Anwer) is currently the only individual with an Admin profile; see Appendix E-1 §17 | Read/write, all patients | Full read/write access to all patient records, messaging, Kroll CSV upload, broadcast notifications/SMS, promotional content, audit log. Gated by `requireAdmin` middleware — checked server-side on every admin route, not just hidden in the UI. |
 | Unauthenticated visitor | N/A | None (except public routes) | Only the public marketing/privacy pages, the promo banner, and the public prescription-transfer / contact-webhook intake forms (rate-limited). No health information is accessible without authentication. |
 
 **Authentication:** password-based (scrypt with random salt, timing-safe comparison — not a
@@ -403,80 +415,85 @@ fast/weak hash) or Google OAuth (native SDK on mobile, redirect flow on web); ac
 after 5 failed attempts; session cookie backed by a server-side Postgres session store, not a
 client-trusted token.
 
-**Termination of access:** an admin account is removed via `DELETE /api/admin/users/:id`
-(prevented for the last admin, so the pharmacy can't accidentally lock itself out).
-`[PHARMACY TO COMPLETE — describe the staff offboarding process for revoking admin access
-when someone leaves.]`
+**Termination of access:** The Pharmacy Manager is currently the only individual with an
+Admin profile; staff members do not have administrative access. If the Pharmacy Manager's
+employment or administrative responsibilities end, the pharmacy owner is responsible for
+ensuring the Admin account is transferred, deactivated, or replaced by an authorized
+replacement Pharmacy Manager. The account is removed or deactivated via
+`DELETE /api/admin/users/:id` (prevented for the last admin, so the pharmacy can't
+accidentally lock itself out). Staff access to other pharmacy systems is reviewed and
+revoked promptly when an employee leaves or no longer requires access. Full detail:
+**Appendix E-1 §17 (Access Controls)**.
 
 ### D.2 Privacy Risk Assessment and Mitigation Plans
 
 | Privacy risk | Description as it applies to this project | Mitigation measures already implemented | Policy reference |
 |---|---|---|---|
-| **1. Unauthorized use by authorized/internal parties** | An admin (pharmacy staff) could view or export patient data beyond what's needed for their task. | Every sensitive admin action is audit-logged (who, what, when, IP). Admin access itself requires the `requireAdmin` server-side check on every route — not just UI-level hiding. | `[PHARMACY: staff access/training policy — to be written]` |
-| **2. Unauthorized collection/use/disclosure by external parties** | A hosting provider, or an attacker who breaches one, could access patient data. | HTTPS-only transport; Helmet security headers with a strict Content-Security-Policy in production; rate limiting on all API traffic and a stricter limiter on credential/messaging endpoints; passwords hashed (scrypt), never stored plain; server-side session validation. | `[PHARMACY: information security policy — to be written]` |
+| **1. Unauthorized use by authorized/internal parties** | Only admin access (the Pharmacy Manager) could view or export patient data beyond what's needed for their task. | Every sensitive admin action is audit-logged (who, what, when, IP). Admin access itself requires the `requireAdmin` server-side check on every route — not just UI-level hiding. | Appendix E-1 §5, §17 |
+| **2. Unauthorized collection/use/disclosure by external parties** | A hosting provider, or an attacker who breaches one, could access patient data. | HTTPS-only transport; Helmet security headers with a strict Content-Security-Policy in production; rate limiting on all API traffic and a stricter limiter on credential/messaging endpoints; passwords hashed (scrypt), never stored plain; server-side session validation. | Appendix E-1 §16 |
 | **3. Loss of integrity of health information** | Data corrupted or altered without authorization. | Server-side validation (Zod schemas) on all writes; Kroll-claim events re-derive the match server-side rather than trusting client-submitted record IDs, preventing a tampered request from attaching the wrong medication history to an account. | — |
-| **4. Loss, destruction, or loss of use of health information** | Data deleted or made unavailable. | Railway-managed Postgres with a persistent volume; retention logic (`server/retention.ts`) enforces the 10-year ACP rule rather than deleting early; account deletion (`DELETE /api/account`) preserves the underlying clinical record and only removes what has no retention obligation, specifically to avoid destroying records the pharmacy is legally required to keep. | `[PHARMACY: backup/disaster-recovery policy — to be written; confirm Railway's backup schedule for the Postgres volume]` |
-| **5. Contractor/business partner non-compliance** | A vendor (Railway, Google, Twilio, DigitalOcean) mishandles data. | See Section C.6 — **this is the weakest area currently**: no confirmed written Information Manager Agreements. | `[PHARMACY: third-party/vendor management policy — to be written; IMAs to be executed]` |
+| **4. Loss, destruction, or loss of use of health information** | Data deleted or made unavailable. | Railway-managed Postgres with a persistent volume; retention logic (`server/retention.ts`) enforces the 10-year ACP rule rather than deleting early; account deletion (`DELETE /api/account`) preserves the underlying clinical record and only removes what has no retention obligation, specifically to avoid destroying records the pharmacy is legally required to keep. | Appendix E-1 §20 (Railway's exact backup schedule is still to be confirmed — see §20) |
+| **5. Contractor/business partner non-compliance** | A vendor (Railway, Google, Twilio, DigitalOcean) mishandles data. | See Section C.6 — written Information Manager Agreements are not yet confirmed for Railway/DigitalOcean; to be initiated if the OIPC review determines one is required, before real patient data is connected. | Appendix E-1 §10 |
 | **6. Name+DOB false-positive match (project-specific)** | Two different patients could, in principle, share the same name and date of birth, causing an incorrect match to be surfaced. | Only a summary (name, DOB, medication *count*) is shown before confirmation — never drug names. Nothing is copied into a profile without explicit "Yes, that's me." A decline is audit-logged. The Health Card Number path avoids this risk entirely, since it is a genuine unique identifier. | — |
-| **7. Staged Kroll data lingering unclaimed** | Bulk dispensing data uploaded to the App's database but never matched to a patient. | Automatic 75-day expiry on unclaimed staged records, swept daily; CSV file itself is parsed in memory only and never written to disk. | — |
+| **7. Staged Kroll data lingering unclaimed** | Bulk dispensing data uploaded to the App's database but never matched to a patient. | Automatic 75-day expiry on unclaimed staged records, swept daily; CSV file itself is parsed in memory only and never written to disk. | N/A |
 | **8. Health Card Number reuse across accounts** | Two patient accounts both claiming the same Health Card Number, corrupting the "one card, one account" audit guarantee. | Enforced twice: an application-level pre-check for a clear error message, and a database-level `UNIQUE` constraint as the race-condition backstop (a concurrent duplicate request is rejected with a Postgres error the server specifically catches and reports). | — |
 
 ### D.3 Monitoring
 
 The audit log (`audit_logs` table) captures every privacy-relevant action with actor, action
-type, free-text detail, and timestamp, and is queryable by admins
-(`GET /api/admin/audit-logs`). `[PHARMACY TO COMPLETE — describe who reviews these logs, how
-often, and what would trigger escalation to a formal incident review.]`
+type, free-text detail, and timestamp, and is queryable by the Pharmacy Manager/Privacy
+Officer (`GET /api/admin/audit-logs`). Logs are reviewed at least monthly, and additionally
+following any suspected privacy incident, patient complaint, unauthorized-access concern, or
+significant system issue. Activity that is unusual, unauthorized, inconsistent with a user's
+role, or otherwise indicative of inappropriate access, disclosure, or modification will be
+investigated and, where warranted, escalated to a formal incident review. Full detail:
+**Appendix E-1 §18 (Monitoring & Audit)**.
 
 ### D.4 PIA Compliance
 
-The pharmacy commits to reviewing this PIA whenever a material change is made to the
-information described in it (new data elements, new vendors, new features that collect,
-use, or disclose health information differently than described here), consistent with
-section 8(3) of the *Health Information Regulation*, and to submitting a PIA amendment or
-revised PIA to the OIPC when such changes occur. `[PHARMACY TO COMPLETE — name who owns this
-review and how often it is scheduled, e.g. annually.]`
+The Pharmacy Manager/Privacy Officer owns this PIA and is responsible for keeping it
+accurate and current. The PIA will be reviewed at least annually, and sooner whenever a
+material change occurs (new data elements, new vendors, new features that collect, use, or
+disclose health information differently than described here), consistent with section 8(3)
+of the *Health Information Regulation*. Where a material change occurs, the Pharmacy
+Manager/Privacy Officer will assess the impact, update the PIA or prepare a PIA amendment,
+and coordinate submission to the OIPC where required. Full detail and the specific list of
+triggers: **Appendix E-1 §11 (Privacy Impact Assessment Policy)**.
 
 ---
 
 ## SECTION E — POLICY & PROCEDURES ATTACHMENTS
 
-**This is the section most likely to cause the OIPC to return this submission as incomplete
-if sent as-is.** The Requirements are explicit: *"Incomplete PIA submissions will be returned
-to the submitter un-reviewed. This applies particularly to submissions that are missing
-policy and procedure attachments."*
+**✅ Attached as Appendix E-1:** the *Remedy Pills Pharmacy Privacy & Information Security
+Policy Manual* (`store-listing/Remedy_Pills_Appendix_E1_Policy_Manual.docx`) — one set of
+organizational policies covering every topic this section requires. The manual itself still
+flags a small number of open items for the pharmacy to confirm before final approval (e.g.
+the exact Railway backup schedule — see its own §20 and §28 checklist); those do not block
+attaching it, since the OIPC's guidance is that thoroughness matters more than every line
+being finalized. The table below maps each required topic to its section in the manual.
 
-Based on what exists in the codebase and documentation reviewed, **the pharmacy has strong
-technical/operational practices already (audit logging, retention automation, minimized SMS
-content, patient confirmation before data import) but does not appear to have these as
-separate, written, organizational policy documents** — which is what this section requires.
-The table below is a checklist, not a claim that these documents already exist:
-
-| Topic | Status | Notes |
-|---|---|---|
-| Privacy Accountability | `[NEEDS TO BE WRITTEN]` | Who's responsible for privacy, information security, complaints; commitments to the practices already implemented in code |
-| Access to Health Information (patient requests) | `[NEEDS TO BE WRITTEN]` | Process/timeframe — the app supports this technically; document the process |
-| Correction Requests | `[NEEDS TO BE WRITTEN]` | |
-| Training, Awareness & Sanctions | `[NEEDS TO BE WRITTEN]` | |
-| Collection of Health Information & Notice | Largely covered by `/privacy` page | Needs the Kroll feature added and the storage-location correction (see C.7) |
-| Use of Health Information | `[NEEDS TO BE WRITTEN]` | |
-| Disclosure of Health Information | `[NEEDS TO BE WRITTEN]` | |
-| Research | Likely N/A | State "not applicable — the pharmacy does not use patient data for research" if true |
-| Third Parties | `[NEEDS TO BE WRITTEN]` | Ties directly to the IMA gap in C.6 |
-| Privacy Impact Assessments (internal trigger policy) | `[NEEDS TO BE WRITTEN]` | When does the pharmacy decide internally that a new PIA is needed |
-| Records Retention & Disposition | **Largely written already** — describe the existing 10-year ACP rule and its automated enforcement (`server/retention.ts`) as the policy | |
-| Information Classification | `[NEEDS TO BE WRITTEN]` | |
-| Risk Assessment | `[NEEDS TO BE WRITTEN]` | |
-| Physical Security of Data & Equipment | `[NEEDS TO BE WRITTEN]` | Covers staff devices, how the Kroll CSV export is handled *before* upload (on a staff computer, outside the app's control) |
-| Network & Communications Security | Partially covered | HTTPS, Helmet CSP, rate limiting are implemented — describe as policy |
-| Access Controls | Partially covered | Server-side role enforcement exists — describe as policy, plus staff onboarding/offboarding process |
-| Monitoring & Audit | Partially covered | Audit log exists — describe review cadence as policy |
-| Incident Response | `[NEEDS TO BE WRITTEN]` | Most important gap — see B.4 |
-| Business Continuity | `[NEEDS TO BE WRITTEN]` | Confirm Railway backup schedule |
-| Change Control | `[NEEDS TO BE WRITTEN]` | |
-
-Most of these can be short — a paragraph or two each is normal for an organization this
-size. The OIPC's guidance is clear that thoroughness matters more than length.
+| PIA Requirement | Policy Manual Section (Appendix E-1) |
+|---|---|
+| Privacy Accountability | §2 |
+| Access to Health Information (patient requests) | §3 |
+| Correction Requests | §4 |
+| Training, Awareness & Sanctions | §5 |
+| Collection of Health Information & Notice | §6 *(also largely covered by the `/privacy` page; still needs the Kroll feature added — see action checklist)* |
+| Use of Health Information | §7 |
+| Disclosure of Health Information | §8 |
+| Research | §9 — not applicable; the pharmacy does not use patient data for research |
+| Third Parties / Information Managers | §10 |
+| Privacy Impact Assessments (internal trigger policy) | §11 |
+| Records Retention & Disposition | §12 |
+| Information Classification | §13 |
+| Risk Assessment | §14 |
+| Physical Security of Data & Equipment | §15 |
+| Network & Communications Security | §16 |
+| Access Controls | §17 |
+| Monitoring & Audit | §18 |
+| Incident Response | §19 |
+| Business Continuity | §20 |
+| Change Control | §21 |
 
 ---
 
@@ -485,16 +502,22 @@ size. The OIPC's guidance is clear that thoroughness matters more than length.
 1. ~~Fix the "stored in Canada" claim in `/privacy`~~ — **done 2026-09-01**, wording now
    accurately discloses US hosting.
 2. Add the Kroll import feature to the patient-facing `/privacy` notice.
-3. Confirm/execute Information Manager Agreements — at minimum with Railway.
-4. Confirm the DigitalOcean Spaces storage region.
-5. Write the Section E policy documents (or confirm which already exist elsewhere and just
-   need attaching).
-6. Fill in every `[PHARMACY TO COMPLETE]` bracket above.
-7. ~~Have the responsible custodian (or authorized representative) review and sign the cover
-   letter~~ — cover letter is finalized on official letterhead as
-   `store-listing/Remedy_Pills_PIA_Cover_Letter.docx`; fill in the submission date and print/sign
-   (or apply an e-signature) before sending.
-8. Email the signed cover letter and this PIA to **pia@oipc.ab.ca**.
+3. Determine whether the OIPC's review requires a written Information Manager Agreement with
+   Railway and/or DigitalOcean; initiate one if so, before real patient data is connected
+   (see C.6).
+4. Confirm the DigitalOcean Spaces storage region (`SPACES_REGION`).
+5. ~~Write the Section E policy documents~~ — **done**: attached as Appendix E-1, the
+   *Privacy & Information Security Policy Manual* (`store-listing/Remedy_Pills_Appendix_E1_Policy_Manual.docx`).
+   Fill in its Effective Date, Next Review Date, and both signatures (§27) before submission.
+6. Confirm the Railway backup schedule, retention period, and restoration process (Appendix
+   E-1 §20), and confirm Twilio's and Gmail's IMA status in the C.6 table above (currently
+   marked TBA).
+7. ~~Have the responsible custodian review and sign the cover letter~~ — cover letter is
+   finalized on official letterhead as `store-listing/Remedy_Pills_PIA_Cover_Letter.docx`,
+   **co-signed by Adeel Siddiqui (Proprietor) and Nayel Anwer (Pharmacy Manager / Privacy
+   Officer)**; fill in the submission date and both sign before sending.
+8. Email the signed cover letter, this PIA, and the signed Appendix E-1 policy manual to
+   **pia@oipc.ab.ca**.
 
 Expect a **preliminary response within ~45 days**, but current overall review turnaround can
 run up to **12 months** given OIPC's backlog — worth starting now rather than waiting for
