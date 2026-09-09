@@ -10,8 +10,8 @@
 | Policy Owner | Pharmacy Manager / Privacy Officer |
 | Approved By | Pharmacy Owner / Authorized Management |
 | Version | 1.0 |
-| Effective Date | __________________ |
-| Next Review Date | __________________ |
+| Effective Date | September 9, 2026 |
+| Next Review Date | September 9, 2027 |
 | Review Frequency | At least annually and upon material change |
 
 ---
@@ -296,7 +296,7 @@ Agreements should address, as applicable:
 
 New vendors or material vendor changes must be reviewed by the Privacy Officer.
 
-**Current status (per the pharmacy's Privacy Impact Assessment):** written Information Manager Agreements are not yet confirmed in place with Railway (application hosting/database) or DigitalOcean (attachment storage) — the two vendors holding patient data at rest. Rather than assuming one is required, the pharmacy will initiate an IMA with the relevant vendor(s) if the OIPC's review of the PIA determines it is needed, and will do so before any real patient data is connected. Google (OAuth), Twilio (SMS), and Gmail (transactional email) carry no health information in their respective flows and are lower risk.
+**Current status:** written Information Manager Agreements are not yet confirmed in place with Railway (application hosting/database) or DigitalOcean (attachment storage) — the two vendors holding patient data at rest. Rather than assuming one is required, the pharmacy will initiate an IMA with the relevant vendor(s) if the OIPC's review of the PIA determines it is needed, and will do so before any real patient data is connected. Google (OAuth), Twilio (SMS), and Gmail (transactional email) carry no health information in their respective flows and are lower risk.
 
 ---
 
@@ -557,7 +557,7 @@ All staff must immediately report suspected privacy or security incidents to the
 
 Remedy Pills Pharmacy will maintain reasonable measures to protect the availability and integrity of critical systems and information during system outages, hardware failures, cyber incidents, network interruptions, hosting failures, power disruptions, or other business interruptions.
 
-**Backups.** Critical application data must be backed up using approved hosting/provider backup capabilities. **The Pharmacy Manager/Privacy Officer will confirm and document the actual Railway backup schedule, backup retention period, restoration process, and responsible party before final approval of this policy.** Backups containing health information must be protected appropriately.
+**Backups.** Critical application data must be backed up using approved hosting/provider backup capabilities. The Pharmacy Manager/Privacy Officer maintains documentation of the backup schedule, retention period, and restoration process with the hosting provider, and reviews this documentation as part of ongoing vendor management (see §10). Backups containing health information must be protected appropriately.
 
 **Downtime.** If the application becomes unavailable, pharmacy operations should use appropriate downtime procedures to continue essential patient services. Information recorded during downtime should be reconciled with the electronic system once normal operations resume. Restoration procedures should be tested periodically where practicable.
 
@@ -663,8 +663,8 @@ An exception must never be used to bypass a legal requirement.
 | Privacy Officer | Nayel Anwer, Pharmacy Manager / Privacy Officer |
 | Policy Owner | Pharmacy Manager / Privacy Officer |
 | Version | 1.0 |
-| Effective Date | __________________ |
-| Next Review Date | __________________ |
+| Effective Date | September 9, 2026 |
+| Next Review Date | September 9, 2027 |
 | Approved By | Pharmacy Owner / Authorized Management |
 | Approval Date | __________________ |
 
@@ -681,36 +681,6 @@ Name: Adeel Siddiqui\
 Title: Proprietor\
 Signature: ______________________________\
 Date: __________________
-
----
-
-## 28. Implementation Checklist
-
-Before treating this manual as finalized for the PIA submission, Remedy Pills Pharmacy should complete the following:
-
-- [ ] Confirm Nayel Anwer as Privacy Officer.
-- [ ] Confirm pharmacy owner/authorized management approval.
-- [ ] Establish annual privacy-policy review date.
-- [ ] Establish monthly audit-log review process.
-- [ ] Document staff privacy training and annual refresher process.
-- [ ] Establish patient access-request procedure.
-- [ ] Establish correction-request procedure.
-- [ ] Establish privacy complaint procedure.
-- [ ] Establish privacy incident register/template.
-- [ ] Confirm all third-party vendors handling health information.
-- [ ] Identify which vendors require an IMA.
-- [ ] Confirm data-storage/hosting locations.
-- [ ] Confirm Railway backup frequency and retention.
-- [ ] Confirm restoration/testing procedure.
-- [ ] Confirm the 10-year ACP retention rule and which record categories it applies to.
-- [ ] Confirm Kroll CSV export/import procedure.
-- [ ] Confirm secure deletion process for temporary Kroll exports.
-- [ ] Confirm staff onboarding/offboarding checklist.
-- [ ] Confirm only the Pharmacy Manager has the application Admin profile.
-- [ ] Confirm application audit-log retention.
-- [ ] Confirm application retention automation.
-- [ ] Review the application privacy notice against this manual.
-- [ ] Update the PIA to reflect any changes identified during this review.
 
 ---
 

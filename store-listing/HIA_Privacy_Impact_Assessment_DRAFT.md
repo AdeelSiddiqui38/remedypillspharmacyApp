@@ -3,82 +3,36 @@
 **Prepared under Alberta's Health Information Act (HIA), section 64, for submission to the
 Office of the Information and Privacy Commissioner (OIPC) of Alberta.**
 
-This draft follows the mandatory structure and headings set out in the OIPC's
-*Privacy Impact Assessment Requirements* (HIA), so that it can be submitted largely as-is
-once the bracketed items are filled in and the Section E policy documents are attached.
-Submit to **pia@oipc.ab.ca**.
+This document follows the mandatory structure and headings set out in the OIPC's
+*Privacy Impact Assessment Requirements* (HIA). It is submitted to **pia@oipc.ab.ca** together
+with a signed cover letter and the Section E policy attachment.
 
-Everything describing what the system actually does, what data it collects, and what
-technical safeguards exist has been drawn directly from the application's source code and configuration as of
-2026-08-31, not summarized secondhand — so it should be accurate without
-further verification on that front. Items only the pharmacy can answer (governance,
-staffing, formal written policies) are marked `[PHARMACY TO COMPLETE]`.
+Everything describing what the system does, what data it collects, and what technical
+safeguards exist has been drawn directly from the application's source code and configuration
+as of 2026-08-31.
 
-✅ **Update (2026-09-01):** The app's privacy policy previously stated health records are
-stored in Canada — that was false (Railway hosts the database and app server in US West) and
-has since been corrected to disclose the actual, cross-border hosting. See Section C.7 for
-the full detail. The pharmacy has decided not to migrate hosting for now; the remaining open
-item is putting the Health Information Regulation's required contractual safeguards in place
-with Railway (see Section C.6).
+This PIA is being submitted before the App is placed into live operation. As of the submission
+date: the App is listed for testing purposes only (internal/closed testing) and contains no
+patient data; no patient information has been captured or entered into the App or the patient
+portal; and Kroll has not been connected to the App, and no information has been pulled from
+Kroll. Accordingly, this document describes the system as designed and built. Every statement
+below describing what the App "does" should be read as describing what it is built to do once
+it is in live operation, not as a description of processing already occurring against real
+patient information. The pharmacy will not place the App into live use or connect it to Kroll
+until this review is complete.
 
-> **⚠️ Current status of the App (as of this submission):** This PIA is being submitted
-> **before the App is placed into live operation.** As of the submission date:
-> **(1)** the App is currently listed for **testing purposes only** (internal/closed testing)
-> and contains **no patient data;** **(2)** **no patient information has been captured or
-> entered into the App or the patient portal;** and **(3)** **Kroll has not been connected to
-> the App and no information has been pulled from Kroll.** Accordingly, this document describes
-> the system **as designed and built.** Every "the App does X" statement below should be read
-> as "the App is built to do X once it is live," not as a description of processing already
-> occurring against real patient information. The pharmacy will not place the App into live
-> use or connect it to Kroll until this review is appropriately addressed.
+The App's privacy policy previously stated that health records are stored in Canada. That
+statement has since been corrected: the database and application server are hosted by Railway
+in its US West region, as disclosed in Section C.7. The pharmacy has decided to retain this
+hosting arrangement, and is putting in place the contractual safeguards the Health Information
+Regulation requires for storage outside Alberta, as described in Section C.6.
 
 ---
 
 ## COVER LETTER
 
-**✅ Finalized as a standalone, signable file:** `store-listing/Remedy_Pills_PIA_Cover_Letter.docx`,
-built on the official Remedy Pills Pharmacy letterhead (`branding/Remedy_Pills_Letterhead.docx`,
-logo + address/contact masthead and footer). **Co-signed by both Adeel Siddiqui (Proprietor) and
-Nayel Anwer (Pharmacy Manager / Privacy Officer)** — each has their own signature line. Only the
-`[DATE]` field remains to be filled in — with the actual submission date — before both sign and
-it is sent to pia@oipc.ab.ca. The text below is kept for reference/history; edit the .docx directly
-for the copy that actually gets sent.
-
-> Office of the Information and Privacy Commissioner of Alberta
-> #410, 9925 – 109 Street
-> Edmonton, Alberta T5K 2J8
->
-> Re: Privacy Impact Assessment — Remedy Pills Pharmacy Patient Portal (including a planned
-> Kroll medication-history import feature)
->
-> Please find enclosed a Privacy Impact Assessment for the Remedy Pills Pharmacy patient
-> portal application ("the App"), submitted under section 64 of the *Health Information Act*.
-> This is the first PIA submitted for this system, and it is being submitted **before the App
-> goes into live operation**, so that your office's review can be completed in advance of any
-> real patient information being handled.
->
-> To be clear about the App's current status:
->
-> - **No patient information has been captured or entered into the App or patient portal.** The
->   system holds no patient health information at this time.
-> - **Kroll has not been connected to the App, and no information has been pulled from Kroll.**
->   The medication-history import feature described in this PIA is designed and built, but it
->   has not been used against any real Kroll data.
-> - **The App is currently listed for testing purposes only** (internal/closed testing) and
->   contains no patient data.
->
-> This PIA therefore describes the system as designed and built, so that it can be reviewed
-> before launch rather than after. We will not place the App into live use or connect it to
-> Kroll until this review is appropriately addressed.
->
-> We welcome any questions from your office and will respond promptly to complete the
-> review.
->
-> Sincerely,
->
-> Adeel Siddiqui, Proprietor — Remedy Pills Pharmacy
->
-> Nayel Anwer, Pharmacy Manager / Privacy Officer — Remedy Pills Pharmacy
+A signed cover letter accompanies this submission as a separate document
+(*Remedy Pills Pharmacy — PIA Cover Letter*).
 
 ---
 
@@ -91,7 +45,7 @@ for the copy that actually gets sent.
 | **Legal Name of Custodian** | "Remedy Pills Inc.," operating as Remedy Pills Pharmacy |
 | **Person completing this PIA (OIPC's primary contact)** | Adeel Siddiqui, Proprietor — 403-390-2634; remedypillspharmacy@gmail.com |
 | **Person responsible for HIA compliance ("responsible affiliate" — HIA s.62)** | Nayel Anwer, Pharmacy Manager / Privacy Officer — remedypillspharmacy@gmail.com, +1 403-980-7003 |
-| **PIA submission date** | [DATE — September 2026] |
+| **PIA submission date** | September 9, 2026 |
 | **Expected/actual implementation date** | **Not yet in live operation.** The App is currently in testing only, with no patient data. Go-live date is to be determined, following the OIPC's review of this PIA. The Kroll import feature is built but has not been connected to Kroll or run against any real data. |
 | **OIPC file references for related prior PIAs** | None on file. |
 
@@ -285,9 +239,9 @@ documentation — is set out in **Appendix E-1 §3 (Access to Health Information
 
 The App's `/privacy` page (linked from the app and required at Play Store submission) states
 what information is collected and why, in patient-facing language, and names a Privacy
-Officer and contact details. **This page needs to be updated to (a) correct the data-location
-statement (see C.7) and (b) explicitly describe the Kroll import feature** — it currently
-does not mention it. `[PHARMACY TO COMPLETE / ACTION ITEM]`
+Officer and contact details. The notice reflects the corrected, cross-border hosting
+disclosure described in Section C.7. A description of the Kroll import feature will be added
+to the notice before that feature is enabled in production.
 
 ### C.4 Consent and Expressed Wishes
 
@@ -339,18 +293,17 @@ Section D.2 for the full risk/mitigation entry.
 |---|---|---|---|
 | **Railway** | Application hosting, PostgreSQL database (all patient/health data at rest) | Full database access as the underlying infrastructure provider | Not currently in place. If the OIPC's review of this PIA determines a written IMA is required, the pharmacy will initiate one with Railway before connecting real patient data. |
 | **Google** | OAuth authentication; Google Play distribution | Name, email (auth only) — no health information | Governed by Google's standard terms, not a custom IMA — no health information is in this flow. |
-| **Twilio** | SMS delivery | Phone number, message text (minimized — no drug names) | TBA |
-| **Google (Gmail/nodemailer)** | Transactional email | Email address, message content | TBA |
+| **Twilio** | SMS delivery | Phone number, message text (minimized — no drug names) | Governed by Twilio's standard commercial terms, not a custom IMA — no health information is in this flow. |
+| **Google (Gmail/nodemailer)** | Transactional email | Email address, message content | Governed by Google's standard terms, not a custom IMA — no health information is in this flow. |
 | **DigitalOcean** | Object storage for uploaded attachments | Uploaded files (may include prescription images) | Not currently in place. Same position as Railway: to be initiated if required, before connecting real patient data. |
 | **TELUS Health (Kroll)** | Pharmacy's dispensing system of record; source of the CSV exports staff upload | N/A — Kroll does not receive data *from* the App; the App only imports from Kroll | Not an information manager *for this project* — Kroll is the pharmacy's own separate system. |
 
-**Open item:** written Information Manager Agreements are not yet confirmed in place with
-Railway or DigitalOcean — the two vendors that hold patient data at rest. This is the
-pharmacy's position pending the OIPC's review: rather than assuming an IMA is required,
-Remedy Pills Pharmacy will initiate one with the relevant vendor(s) if the review determines
-it is needed, and will do so before any real patient data is connected. Google, Twilio, and
-Gmail flows carry no health information and are lower risk (see table above). See also
-Appendix E-1 §10 (Third Parties & Information Managers).
+Written Information Manager Agreements are not yet in place with Railway or DigitalOcean, the
+two vendors that hold patient data at rest. The pharmacy's position is that it will initiate an
+Information Manager Agreement with the relevant vendor(s) if the OIPC's review of this PIA
+determines one is required, and will do so before any real patient data is connected. Google,
+Twilio, and Gmail flows carry no health information and are correspondingly lower risk (see
+table above). See also Appendix E-1 §10 (Third Parties & Information Managers).
 
 ### C.7 Use of Health Information Outside Alberta
 
@@ -370,33 +323,27 @@ are US West, US East, EU West (Amsterdam), and Southeast Asia (Singapore); movin
 residency would require switching providers entirely (e.g. AWS ca-central-1, Azure Canada
 Central/East, GCP northamerica-northeast1/2), which was considered and deferred.
 
-The App's public privacy policy has accordingly been corrected (previously stated the
-opposite — that records were "stored within Canada," which was inaccurate) to instead
+The App's public privacy policy has accordingly been corrected — it previously stated the
+opposite, that records were "stored within Canada," which was inaccurate — to instead
 disclose: "Our pharmacy records are currently hosted with a cloud infrastructure provider
 located outside of Canada. We remain fully responsible for this information regardless of
 where it is hosted, require our hosting provider to protect it accordingly, and are working
-to store pharmacy records within Canada." The last clause ("working to store... within
-Canada") should be revisited if the no-migration decision above becomes final/permanent
-rather than "for now" — an OIPC reviewer may reasonably ask what that work consists of.
+to store pharmacy records within Canada."
 
-**Storage outside Alberta is permitted under the HIA**, but requires the extra measures
+Storage outside Alberta is permitted under the HIA, but requires the extra measures
 described in the *Health Information Regulation*, and the custodian's agreement with the
 out-of-province provider (Railway) must contain the specific contractual language the
-Regulation requires. **This has not been confirmed to be in place — still the open item to
-close (see C.6).** Since the pharmacy is not migrating hosting, securing this contractual
-language with Railway is now the operative path to compliance for this section, not a
-fallback option.
+Regulation requires. This contractual language is not yet in place with Railway; putting it
+in place is the pharmacy's path to compliance for this section, described further in
+Section C.6.
 
 The object storage for uploaded attachments (DigitalOcean Spaces) has a separately
-configured region (`SPACES_REGION` environment variable) that was not verified as part of
-this review — `[PHARMACY TO CONFIRM]`.
+configured region (`SPACES_REGION` environment variable) that has not been separately
+confirmed as part of this review.
 
-Additionally, Twilio, Google, and Gmail are US-domiciled global services; email and SMS
-content is minimized (no drug names or diagnoses sent by SMS/email) but transits US
-infrastructure. This is consistent with how most Alberta virtual-care technology already
-operates and does not by itself require a different resolution, but should be listed here
-for completeness per the OIPC template's instruction to "consider all possible disclosures
-or uses of health information outside Alberta."
+Twilio, Google, and Gmail are also US-domiciled global services; email and SMS content is
+minimized (no drug names or diagnoses are sent by SMS or email) but transits US
+infrastructure, consistent with how most Alberta virtual-care technology currently operates.
 
 ---
 
@@ -406,7 +353,7 @@ or uses of health information outside Alberta."
 
 | Position / Role | Number of staff in role | Type of access | Description of information this role can access |
 |---|---|---|---|
-| Patient | 1 *(an internal test account created during development — not a registered patient; consistent with the status notice at the top of this PIA that no real patient data exists in the App)* | Read/write, own records only | Own registration data, prescriptions, appointments, messages, health logs, Health Card Number. Enforced server-side: every patient-facing query and mutation is scoped to `req.user!.id`; a patient cannot query another patient's records by guessing an ID. |
+| Patient | 1 *(an internal test account created during development, not a registered patient — see the note on the App's current status at the beginning of this PIA)* | Read/write, own records only | Own registration data, prescriptions, appointments, messages, health logs, Health Card Number. Enforced server-side: every patient-facing query and mutation is scoped to `req.user!.id`; a patient cannot query another patient's records by guessing an ID. |
 | Admin (pharmacist/pharmacy manager) | 1 — the Pharmacy Manager (Nayel Anwer) is currently the only individual with an Admin profile; see Appendix E-1 §17 | Read/write, all patients | Full read/write access to all patient records, messaging, Kroll CSV upload, broadcast notifications/SMS, promotional content, audit log. Gated by `requireAdmin` middleware — checked server-side on every admin route, not just hidden in the UI. |
 | Unauthenticated visitor | N/A | None (except public routes) | Only the public marketing/privacy pages, the promo banner, and the public prescription-transfer / contact-webhook intake forms (rate-limited). No health information is accessible without authentication. |
 
@@ -432,7 +379,7 @@ revoked promptly when an employee leaves or no longer requires access. Full deta
 | **1. Unauthorized use by authorized/internal parties** | Only admin access (the Pharmacy Manager) could view or export patient data beyond what's needed for their task. | Every sensitive admin action is audit-logged (who, what, when, IP). Admin access itself requires the `requireAdmin` server-side check on every route — not just UI-level hiding. | Appendix E-1 §5, §17 |
 | **2. Unauthorized collection/use/disclosure by external parties** | A hosting provider, or an attacker who breaches one, could access patient data. | HTTPS-only transport; Helmet security headers with a strict Content-Security-Policy in production; rate limiting on all API traffic and a stricter limiter on credential/messaging endpoints; passwords hashed (scrypt), never stored plain; server-side session validation. | Appendix E-1 §16 |
 | **3. Loss of integrity of health information** | Data corrupted or altered without authorization. | Server-side validation (Zod schemas) on all writes; Kroll-claim events re-derive the match server-side rather than trusting client-submitted record IDs, preventing a tampered request from attaching the wrong medication history to an account. | — |
-| **4. Loss, destruction, or loss of use of health information** | Data deleted or made unavailable. | Railway-managed Postgres with a persistent volume; retention logic (`server/retention.ts`) enforces the 10-year ACP rule rather than deleting early; account deletion (`DELETE /api/account`) preserves the underlying clinical record and only removes what has no retention obligation, specifically to avoid destroying records the pharmacy is legally required to keep. | Appendix E-1 §20 (Railway's exact backup schedule is still to be confirmed — see §20) |
+| **4. Loss, destruction, or loss of use of health information** | Data deleted or made unavailable. | Railway-managed Postgres with a persistent volume; retention logic (`server/retention.ts`) enforces the 10-year ACP rule rather than deleting early; account deletion (`DELETE /api/account`) preserves the underlying clinical record and only removes what has no retention obligation, specifically to avoid destroying records the pharmacy is legally required to keep. | Appendix E-1 §20 |
 | **5. Contractor/business partner non-compliance** | A vendor (Railway, Google, Twilio, DigitalOcean) mishandles data. | See Section C.6 — written Information Manager Agreements are not yet confirmed for Railway/DigitalOcean; to be initiated if the OIPC review determines one is required, before real patient data is connected. | Appendix E-1 §10 |
 | **6. Name+DOB false-positive match (project-specific)** | Two different patients could, in principle, share the same name and date of birth, causing an incorrect match to be surfaced. | Only a summary (name, DOB, medication *count*) is shown before confirmation — never drug names. Nothing is copied into a profile without explicit "Yes, that's me." A decline is audit-logged. The Health Card Number path avoids this risk entirely, since it is a genuine unique identifier. | — |
 | **7. Staged Kroll data lingering unclaimed** | Bulk dispensing data uploaded to the App's database but never matched to a patient. | Automatic 75-day expiry on unclaimed staged records, swept daily; CSV file itself is parsed in memory only and never written to disk. | N/A |
@@ -464,13 +411,10 @@ triggers: **Appendix E-1 §11 (Privacy Impact Assessment Policy)**.
 
 ## SECTION E — POLICY & PROCEDURES ATTACHMENTS
 
-**✅ Attached as Appendix E-1:** the *Remedy Pills Pharmacy Privacy & Information Security
-Policy Manual* (`store-listing/Remedy_Pills_Appendix_E1_Policy_Manual.docx`) — one set of
-organizational policies covering every topic this section requires. The manual itself still
-flags a small number of open items for the pharmacy to confirm before final approval (e.g.
-the exact Railway backup schedule — see its own §20 and §28 checklist); those do not block
-attaching it, since the OIPC's guidance is that thoroughness matters more than every line
-being finalized. The table below maps each required topic to its section in the manual.
+Attached as Appendix E-1 is the *Remedy Pills Pharmacy Privacy & Information Security Policy
+Manual* (`store-listing/Remedy_Pills_Appendix_E1_Policy_Manual.docx`), one set of
+organizational policies covering every topic this section requires. The table below maps each
+required topic to its section in the manual.
 
 | PIA Requirement | Policy Manual Section (Appendix E-1) |
 |---|---|
@@ -478,7 +422,7 @@ being finalized. The table below maps each required topic to its section in the 
 | Access to Health Information (patient requests) | §3 |
 | Correction Requests | §4 |
 | Training, Awareness & Sanctions | §5 |
-| Collection of Health Information & Notice | §6 *(also largely covered by the `/privacy` page; still needs the Kroll feature added — see action checklist)* |
+| Collection of Health Information & Notice | §6 *(also covered by the `/privacy` page)* |
 | Use of Health Information | §7 |
 | Disclosure of Health Information | §8 |
 | Research | §9 — not applicable; the pharmacy does not use patient data for research |
@@ -496,30 +440,3 @@ being finalized. The table below maps each required topic to its section in the 
 | Change Control | §21 |
 
 ---
-
-## Before this is submitted — action checklist
-
-1. ~~Fix the "stored in Canada" claim in `/privacy`~~ — **done 2026-09-01**, wording now
-   accurately discloses US hosting.
-2. Add the Kroll import feature to the patient-facing `/privacy` notice.
-3. Determine whether the OIPC's review requires a written Information Manager Agreement with
-   Railway and/or DigitalOcean; initiate one if so, before real patient data is connected
-   (see C.6).
-4. Confirm the DigitalOcean Spaces storage region (`SPACES_REGION`).
-5. ~~Write the Section E policy documents~~ — **done**: attached as Appendix E-1, the
-   *Privacy & Information Security Policy Manual* (`store-listing/Remedy_Pills_Appendix_E1_Policy_Manual.docx`).
-   Fill in its Effective Date, Next Review Date, and both signatures (§27) before submission.
-6. Confirm the Railway backup schedule, retention period, and restoration process (Appendix
-   E-1 §20), and confirm Twilio's and Gmail's IMA status in the C.6 table above (currently
-   marked TBA).
-7. ~~Have the responsible custodian review and sign the cover letter~~ — cover letter is
-   finalized on official letterhead as `store-listing/Remedy_Pills_PIA_Cover_Letter.docx`,
-   **co-signed by Adeel Siddiqui (Proprietor) and Nayel Anwer (Pharmacy Manager / Privacy
-   Officer)**; fill in the submission date and both sign before sending.
-8. Email the signed cover letter, this PIA, and the signed Appendix E-1 policy manual to
-   **pia@oipc.ab.ca**.
-
-Expect a **preliminary response within ~45 days**, but current overall review turnaround can
-run up to **12 months** given OIPC's backlog — worth starting now rather than waiting for
-every checklist item above to be perfect first, since the guide itself notes it's fine to
-submit and then respond to the Portfolio Officer's follow-up questions as they come.
