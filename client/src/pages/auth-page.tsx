@@ -71,9 +71,15 @@ export default function AuthPage() {
     }
   };
 
-  const { data: providers } = useQuery<{ google: boolean; googleClientId: string | null }>({
+  const { data: providers } = useQuery<{
+    google: boolean;
+    googleClientId: string | null;
+    registrationOpen: boolean;
+  }>({
     queryKey: ["/api/auth/providers"],
   });
+  // Older servers don't send registrationOpen; treat missing as open.
+  const registrationOpen = providers?.registrationOpen !== false;
 
   if (user) {
     if (user.role === "admin") return <Redirect to="/admin" />;
@@ -142,26 +148,41 @@ export default function AuthPage() {
               </div>
             </div>
 
-            <div className="space-y-3">
-              <Button
-                className="h-14 w-full rounded-full bg-white text-base font-bold text-[hsl(186,86%,25%)] shadow-xl hover:bg-white/95"
-                onClick={() => setScreen("register")}
-                data-testid="button-get-started"
-              >
-                GET STARTED
-              </Button>
+            {registrationOpen ? (
+              <div className="space-y-3">
+                <Button
+                  className="h-14 w-full rounded-full bg-white text-base font-bold text-[hsl(186,86%,25%)] shadow-xl hover:bg-white/95"
+                  onClick={() => setScreen("register")}
+                  data-testid="button-get-started"
+                >
+                  GET STARTED
+                </Button>
 
-              <div className="text-center">
-                <button
-                  type="button"
-                  className="text-sm text-white/90 hover:text-white"
+                <div className="text-center">
+                  <button
+                    type="button"
+                    className="text-sm text-white/90 hover:text-white"
+                    onClick={() => setScreen("login")}
+                    data-testid="button-go-login"
+                  >
+                    Already have an account? <span className="font-bold underline">Log In</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                <Button
+                  className="h-14 w-full rounded-full bg-white text-base font-bold text-[hsl(186,86%,25%)] shadow-xl hover:bg-white/95"
                   onClick={() => setScreen("login")}
                   data-testid="button-go-login"
                 >
-                  Already have an account? <span className="font-bold underline">Log In</span>
-                </button>
+                  LOG IN
+                </Button>
+                <p className="text-center text-sm text-white/80" data-testid="text-registration-closed">
+                  New patient sign-ups are temporarily closed.
+                </p>
               </div>
-            </div>
+            )}
           </div>
         </div>
 
@@ -275,16 +296,18 @@ export default function AuthPage() {
                 {loginMutation.isPending ? "Signing in..." : "Sign In"}
               </Button>
 
-              <div className="space-y-2 text-center">
-                <button
-                  type="button"
-                  className="text-sm text-primary hover:underline"
-                  onClick={() => setScreen("register")}
-                  data-testid="button-toggle-auth"
-                >
-                  Don't have an account? <span className="font-semibold">Create one</span>
-                </button>
-              </div>
+              {registrationOpen && (
+                <div className="space-y-2 text-center">
+                  <button
+                    type="button"
+                    className="text-sm text-primary hover:underline"
+                    onClick={() => setScreen("register")}
+                    data-testid="button-toggle-auth"
+                  >
+                    Don't have an account? <span className="font-semibold">Create one</span>
+                  </button>
+                </div>
+              )}
             </form>
           </div>
         </div>

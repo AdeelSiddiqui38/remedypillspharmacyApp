@@ -28,6 +28,15 @@ const MAX_FAILED_ATTEMPTS = 5;
 const LOCKOUT_MINUTES = 15;
 const SESSION_MAX_AGE = 30 * 60 * 1000;
 
+// Public self-sign-up (form and Google) is closed unless REGISTRATION_OPEN is
+// "true". The pharmacy committed to the OIPC that no patients would be
+// onboarded until its Privacy Impact Assessment review is complete. Existing
+// accounts can still sign in, and admins can still create accounts from the
+// admin console (POST /api/admin/users).
+const REGISTRATION_OPEN = process.env.REGISTRATION_OPEN === "true";
+const REGISTRATION_CLOSED_MESSAGE =
+  "New sign-ups are temporarily closed. Existing accounts can still sign in.";
+
 // Only these fields can be set by a self-registering user. Excludes role,
 // provider, providerId, and tracking fields to prevent privilege escalation
 // via mass assignment.
@@ -92,9 +101,11 @@ async function findOrCreateSocialUser(
   provider: string,
   providerId: string,
   profile: { name?: string; email?: string },
-): Promise<SelectUser> {
+): Promise<SelectUser | null> {
   let user = await storage.getUserByProvider(provider, providerId);
   if (user) return user;
+  // Unknown Google account while sign-up is closed: sign-in only, no new account.
+  if (!REGISTRATION_OPEN) return null;
 
   const randomPassword = await hashPassword(randomBytes(32).toString("hex"));
   const uniqueUsername = `${provider}_${providerId}`;
@@ -229,6 +240,9 @@ export function setupAuth(app: Express) {
               name: profile.displayName,
               email: profile.emails?.[0]?.value,
             });
+            if (!user) {
+              return done(null, false, { message: REGISTRATION_CLOSED_MESSAGE });
+            }
             // A deleted account keeps its provider id, so signing in with the
             // same Google account would otherwise revive it.
             if (user.deletedAt) {
@@ -261,6 +275,9 @@ export function setupAuth(app: Express) {
   });
 
   app.post("/api/register", authLimiter, async (req, res, next) => {
+    if (!REGISTRATION_OPEN) {
+      return res.status(403).json({ message: REGISTRATION_CLOSED_MESSAGE });
+    }
     try {
       const parsed = registrationSchema.safeParse(req.body);
       if (!parsed.success) {
@@ -461,6 +478,7 @@ export function setupAuth(app: Express) {
       // ID is not a secret — it travels in the query string of every redirect
       // in the web flow. The client *secret* stays on the server.
       googleClientId: process.env.GOOGLE_CLIENT_ID || null,
+      registrationOpen: REGISTRATION_OPEN,
     });
   });
 
@@ -505,6 +523,9 @@ export function setupAuth(app: Express) {
         name: payload.name,
         email: payload.email,
       });
+      if (!user) {
+        return res.status(403).json({ message: REGISTRATION_CLOSED_MESSAGE });
+      }
       if (user.deletedAt) {
         return res.status(403).json({ message: "This account has been deleted" });
       }
